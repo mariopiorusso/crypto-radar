@@ -1,0 +1,20 @@
+scan_interval_seconds: 300
+coin_count: 100
+currency: usd
+
+filters:
+  min_market_cap_usd: 50000000
+  min_24h_volume_usd: 5000000
+  max_abs_24h_change_pct: 35
+  candidate_limit: 8
+  min_history_points: 6
+  anomaly_threshold: 2.0
+
+ai:
+  enabled: true
+  min_pre_score: 45
+  alert_score: 80
+  max_news_items: 8
+
+database:
+  path: data/crypto_radar.db
