@@ -12,4 +12,7 @@ def send_alert(text):
         timeout=20,
     )
     r.raise_for_status()
-    return True
+    body = r.json()
+    if not body.get("ok"):
+        raise RuntimeError("Telegram rejected delivery")
+    return str(body["result"]["message_id"])

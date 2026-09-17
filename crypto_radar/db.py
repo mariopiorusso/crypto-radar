@@ -48,23 +48,31 @@ CREATE TABLE IF NOT EXISTS outcomes (
 def connect(path: str):
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(p)
+    conn = sqlite3.connect(p, timeout=10)
     conn.row_factory = sqlite3.Row
-    conn.executescript(SCHEMA)
+    try:
+        if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='market_observations'").fetchone():
+            conn.executescript(SCHEMA)
+        from .migrations import migrate
+        migrate(conn, p)
+        conn.execute("PRAGMA foreign_keys=ON")
+    except BaseException:
+        conn.close()
+        raise
     return conn
 
 def utc_now_iso():
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
-def save_markets(conn, rows):
-    ts = utc_now_iso()
+def save_markets(conn, rows, ts=None):
+    ts = ts or utc_now_iso()
     conn.executemany(
-        """INSERT OR REPLACE INTO market_observations
-        (ts, coin_id, symbol, name, price, market_cap, total_volume, change_24h)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+        """INSERT OR IGNORE INTO market_observations
+        (ts, coin_id, symbol, name, price, market_cap, total_volume, change_24h, source_updated_ts)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         [(ts, r["id"], r["symbol"], r["name"], r.get("current_price"),
           r.get("market_cap"), r.get("total_volume"),
-          r.get("price_change_percentage_24h")) for r in rows]
+          r.get("price_change_percentage_24h"), r.get("last_updated")) for r in rows]
     )
     conn.commit()
     return ts

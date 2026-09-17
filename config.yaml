@@ -6,7 +6,8 @@ filters:
   min_market_cap_usd: 50000000
   min_24h_volume_usd: 5000000
   max_abs_24h_change_pct: 35
-  candidate_limit: 8
+  # Stablecoin IDs use the maintained defaults in crypto_radar/filters.py.
+  # Set stablecoin_ids here to replace that list.
   min_history_points: 6
   anomaly_threshold: 2.0
 
@@ -15,6 +16,26 @@ ai:
   min_pre_score: 45
   alert_score: 80
   max_news_items: 8
+  max_candidates_per_scan: 8
+  daily_call_budget: 50
+  cooldown_minutes: 60
+  material_score_increase: 10
+  timeout_seconds: 60
+  max_output_tokens: 2000
+
+alerts:
+  telegram_enabled: true
+  email_enabled: true
+  material_score_increase: 10
+  episode_reset_hours: 24
+
+outcomes:
+  tolerance_seconds: 600
+
+logging:
+  path: logs/crypto_radar.log
+  max_bytes: 5000000
+  backup_count: 3
 
 database:
   path: data/crypto_radar.db
