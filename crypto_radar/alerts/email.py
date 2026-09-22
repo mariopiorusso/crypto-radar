@@ -11,7 +11,7 @@ def configured():
     return all(os.getenv(k, "").strip() for k in ("SMTP_HOST", "EMAIL_FROM", "EMAIL_TO"))
 
 
-def send_alert(text):
+def send_alert(text, *, subject="Crypto Radar experimental signal", attachments=()):
     if not configured():
         raise ValueError("Email configuration missing")
     security = os.getenv("SMTP_SECURITY", "starttls").lower()
@@ -25,18 +25,21 @@ def send_alert(text):
         if os.getenv("SMTP_USERNAME") or os.getenv("SMTP_PASSWORD"):
             raise ValueError("Local SMTP must not send credentials")
     message = EmailMessage()
-    message["Subject"] = "Crypto Radar experimental signal"
+    message["Subject"] = subject
     message["Date"] = formatdate(localtime=False)
     message["Message-ID"] = make_msgid()
     message["From"] = os.environ["EMAIL_FROM"]
     recipients = [r.strip() for r in os.environ["EMAIL_TO"].split(",") if r.strip()]
     message["To"] = ", ".join(recipients)
     message.set_content(text)
+    for filename, content in attachments:
+        subtype = "zip" if filename.lower().endswith(".zip") else "octet-stream"
+        message.add_attachment(content, maintype="application", subtype=subtype, filename=filename)
     context = ssl.create_default_context() if security != "local" else None
     port = int(os.getenv("SMTP_PORT", "465" if security == "ssl" else "587"))
     factory = smtplib.SMTP_SSL if security == "ssl" else smtplib.SMTP
     kwargs = {"context": context} if security == "ssl" else {}
-    with factory(host, port, timeout=60 if security == "local" else 20, **kwargs) as smtp:
+    with factory(host, port, timeout=180 if security == "local" else 60, **kwargs) as smtp:
         if security == "starttls":
             smtp.starttls(context=context)
         username = os.getenv("SMTP_USERNAME")

@@ -1,0 +1,97 @@
+"""Schema v2: forward-only experimental evidence; legacy tables remain intact."""
+STATEMENTS = [
+    """CREATE TABLE research_episodes (
+        id INTEGER PRIMARY KEY, coin_id TEXT NOT NULL, started_ts TEXT NOT NULL,
+        last_signal_ts TEXT NOT NULL, anchor_ts TEXT NOT NULL, anchor_price REAL NOT NULL,
+        first_social_anomaly_ts TEXT, first_news_event_ts TEXT, first_market_anomaly_ts TEXT,
+        first_v11_candidate_ts TEXT, first_v12_candidate_ts TEXT,
+        significant_move_ts TEXT, significant_move_pct REAL NOT NULL,
+        move_window_hours REAL NOT NULL, definition_version TEXT NOT NULL)""",
+    "CREATE INDEX idx_research_episode_coin ON research_episodes(coin_id,id)",
+    """CREATE TABLE social_observations (
+        id INTEGER PRIMARY KEY, coin_id TEXT NOT NULL, source TEXT NOT NULL,
+        window_start TEXT NOT NULL, window_end TEXT NOT NULL, observed_ts TEXT NOT NULL,
+        mentions INTEGER NOT NULL, unique_authors INTEGER, engagement REAL, sentiment REAL,
+        duplicate_fraction REAL, top_author_fraction REAL, metadata_json TEXT NOT NULL,
+        UNIQUE(coin_id,source,window_start,window_end))""",
+    "CREATE INDEX idx_social_coin_time ON social_observations(coin_id,window_end)",
+    """CREATE TABLE social_features (
+        id INTEGER PRIMARY KEY, scan_id INTEGER NOT NULL REFERENCES scan_runs(id),
+        coin_id TEXT NOT NULL, asof_ts TEXT NOT NULL, status TEXT NOT NULL,
+        mentions_5m INTEGER, mentions_15m INTEGER, mentions_1h INTEGER,
+        baseline_windows INTEGER NOT NULL, mention_acceleration REAL,
+        author_acceleration REAL, engagement_acceleration REAL, sentiment_change REAL,
+        source_count INTEGER, duplicate_fraction REAL, top_author_fraction REAL,
+        score REAL NOT NULL, features_json TEXT NOT NULL, UNIQUE(scan_id,coin_id))""",
+    """CREATE TABLE news_evidence (
+        id INTEGER PRIMARY KEY, coin_id TEXT NOT NULL, fingerprint TEXT NOT NULL,
+        first_observed_ts TEXT NOT NULL, publication_ts TEXT, title TEXT NOT NULL,
+        link TEXT NOT NULL, source TEXT NOT NULL, catalyst_type TEXT NOT NULL,
+        relevance REAL NOT NULL, source_quality REAL, event_key TEXT NOT NULL,
+        UNIQUE(coin_id,fingerprint))""",
+    "CREATE INDEX idx_news_coin_time ON news_evidence(coin_id,first_observed_ts)",
+    "CREATE INDEX idx_news_event ON news_evidence(coin_id,event_key,first_observed_ts)",
+    """CREATE TABLE collector_runs (
+        scan_id INTEGER NOT NULL REFERENCES scan_runs(id), collector TEXT NOT NULL,
+        coin_id TEXT NOT NULL, observed_ts TEXT NOT NULL, status TEXT NOT NULL,
+        item_count INTEGER NOT NULL, error TEXT, PRIMARY KEY(scan_id,collector,coin_id))""",
+    """CREATE TABLE experiment_evaluations (
+        id INTEGER PRIMARY KEY, scan_id INTEGER NOT NULL REFERENCES scan_runs(id),
+        coin_id TEXT NOT NULL, signal_version TEXT NOT NULL, experiment_group TEXT NOT NULL,
+        detected_ts TEXT NOT NULL, evidence_cutoff_ts TEXT NOT NULL, market_ts TEXT NOT NULL,
+        start_price REAL, episode_id INTEGER REFERENCES research_episodes(id),
+        v11_evaluation_id INTEGER REFERENCES candidate_evaluations(id),
+        social_feature_id INTEGER REFERENCES social_features(id),
+        market_score REAL, social_score REAL, news_score REAL, pre_score REAL,
+        eligible INTEGER NOT NULL, decision TEXT NOT NULL, reason TEXT,
+        price_move_before_pct REAL, features_json TEXT NOT NULL,
+        UNIQUE(scan_id,coin_id,signal_version,experiment_group))""",
+    "CREATE INDEX idx_experiment_episode ON experiment_evaluations(episode_id,experiment_group)",
+    "CREATE INDEX idx_collector_asset ON collector_runs(collector,coin_id,observed_ts)",
+    """CREATE TABLE evaluation_news (
+        evaluation_id INTEGER NOT NULL REFERENCES experiment_evaluations(id),
+        news_id INTEGER NOT NULL REFERENCES news_evidence(id), age_seconds REAL,
+        novelty REAL NOT NULL, independent_confirmations INTEGER,
+        PRIMARY KEY(evaluation_id,news_id))""",
+    """CREATE TABLE benchmark_members (
+        scan_id INTEGER NOT NULL REFERENCES scan_runs(id), coin_id TEXT NOT NULL,
+        observed_ts TEXT NOT NULL,start_price REAL NOT NULL, PRIMARY KEY(scan_id,coin_id))""",
+    """CREATE TABLE benchmark_context (
+        evaluation_id INTEGER NOT NULL REFERENCES experiment_evaluations(id),
+        benchmark TEXT NOT NULL, coin_id TEXT NOT NULL, observed_ts TEXT NOT NULL,
+        start_price REAL NOT NULL, PRIMARY KEY(evaluation_id,benchmark,coin_id))""",
+    """CREATE TABLE experiment_outcomes (
+        evaluation_id INTEGER NOT NULL REFERENCES experiment_evaluations(id),
+        horizon_hours INTEGER NOT NULL, target_ts TEXT NOT NULL,
+        observed_ts TEXT, later_price REAL, return_pct REAL, timing_error_seconds REAL,
+        timing_status TEXT NOT NULL DEFAULT 'pending', tolerance_seconds INTEGER NOT NULL,
+        btc_return_pct REAL, eth_return_pct REAL, broad_return_pct REAL,
+        excess_btc_pct REAL, excess_eth_pct REAL, excess_broad_pct REAL,
+        benchmark_status TEXT, PRIMARY KEY(evaluation_id,horizon_hours))""",
+    "CREATE INDEX idx_experiment_outcome_pending ON experiment_outcomes(timing_status,target_ts)",
+    "CREATE INDEX idx_experiment_outcome_observed ON experiment_outcomes(observed_ts,target_ts)",
+    """CREATE TABLE benchmark_outcomes (
+        evaluation_id INTEGER NOT NULL, horizon_hours INTEGER NOT NULL,
+        benchmark TEXT NOT NULL, coin_id TEXT NOT NULL, observed_ts TEXT,
+        later_price REAL, return_pct REAL, status TEXT NOT NULL,
+        PRIMARY KEY(evaluation_id,horizon_hours,benchmark,coin_id))""",
+    """CREATE TABLE v12_ai_calls (
+        id INTEGER PRIMARY KEY, evaluation_id INTEGER NOT NULL UNIQUE REFERENCES experiment_evaluations(id),
+        coin_id TEXT NOT NULL, budget_date TEXT NOT NULL, reserved_ts TEXT NOT NULL,
+        completed_ts TEXT, status TEXT NOT NULL, pre_score REAL NOT NULL,
+        requested_model TEXT NOT NULL, returned_model TEXT, request_json TEXT NOT NULL,
+        response_json TEXT, usage_json TEXT, error TEXT)""",
+    "CREATE INDEX idx_v12_calls_budget ON v12_ai_calls(budget_date)",
+    "CREATE INDEX idx_v12_calls_coin ON v12_ai_calls(coin_id,reserved_ts)",
+    "ALTER TABLE assessments ADD COLUMN experiment_evaluation_id INTEGER REFERENCES experiment_evaluations(id)",
+    "ALTER TABLE assessments ADD COLUMN v12_ai_call_id INTEGER REFERENCES v12_ai_calls(id)",
+    "ALTER TABLE alert_events ADD COLUMN research_episode_id INTEGER REFERENCES research_episodes(id)",
+    """CREATE VIEW experiment_lead_times AS SELECT *,
+        (julianday(first_v11_candidate_ts)-julianday(first_v12_candidate_ts))*1440 AS v12_before_v11_minutes,
+        (julianday(significant_move_ts)-julianday(first_v12_candidate_ts))*1440 AS v12_before_move_minutes,
+        (julianday(significant_move_ts)-julianday(first_v11_candidate_ts))*1440 AS v11_before_move_minutes
+        FROM research_episodes""",
+    """CREATE VIEW experiment_ai_usage AS
+        SELECT '1.1' AS signal_version,id,evaluation_id,budget_date,reserved_ts,status,usage_json FROM ai_calls
+        UNION ALL SELECT '1.2',id,evaluation_id,budget_date,reserved_ts,status,usage_json FROM v12_ai_calls""",
+]

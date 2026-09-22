@@ -40,7 +40,7 @@ class RelayTests(unittest.TestCase):
             client=smtp.return_value.__enter__.return_value
             client.sendmail.return_value={}
             self.relay.forward(b'test',['to@example.invalid'])
-            smtp.assert_called_once_with('smtp.gmail.com',587,timeout=10)
+            smtp.assert_called_once_with('smtp.gmail.com',587,timeout=30)
             client.starttls.assert_called_once()
             client.login.assert_called_once_with('sender@gmail.com','test-only')
 

@@ -17,8 +17,9 @@ from .alerts import email, telegram
 from .db import connect, save_markets, history
 from .filters import is_stablecoin
 from .outcomes import create_outcomes, fill_due_outcomes
-from .policies import cooldown_allowed, reserve_call, update_episode, reserve_alert
+from .policies import cooldown_allowed, reserve_call, update_episode, reserve_alert, daily_usage
 from .operational import process_lock, setup_logging
+from . import experiment, experiment_measurement
 
 log = logging.getLogger(__name__)
 
@@ -28,6 +29,8 @@ def now_utc():
 
 
 def deliver_alerts(conn, cfg, aid, coin, result, episode, summary):
+    research = conn.execute('''SELECT e.episode_id FROM experiment_evaluations e JOIN assessments a
+        ON e.id=a.experiment_evaluation_id OR e.v11_evaluation_id=a.evaluation_id WHERE a.id=?''',(aid,)).fetchone()
     text = (f"CRYPTO RADAR — EXPERIMENTAL SIGNAL\n"
             f"{coin['name']} ({coin['symbol'].upper()}) — {result['surge_score']}/100\n"
             f"Stage: {result['stage']}\n{result['thesis']}\nRisks: {result['risks']}\n"
@@ -48,7 +51,7 @@ def deliver_alerts(conn, cfg, aid, coin, result, episode, summary):
     for channel, sender in channels:
         event_id = reserve_alert(conn, aid, coin["id"], episode, channel,
                                  result["surge_score"], text, now_utc(),
-                                 cfg["alerts"]["material_score_increase"])
+                                 cfg["alerts"]["material_score_increase"], research[0] if research else None)
         if event_id is None:
             summary["alerts_suppressed"] += 1
             continue
@@ -68,12 +71,20 @@ def deliver_alerts(conn, cfg, aid, coin, result, episode, summary):
         conn.commit()
 
 
-def run_scan(cfg):
+def run_scan(cfg, detector=None, social_provider=None):
     cfg = normalize(cfg)
+    detector = detector or ('all' if cfg['v12']['enabled'] else 'v11')
+    if detector not in ('v11','v12','all'):
+        raise ValueError('Unknown detector mode')
+    # Explicit CLI/function mode overrides the configuration enable switch.
+    cfg['v12']['enabled'] = detector in ('v12','all')
     started = time.monotonic()
     summary = dict.fromkeys(("coins_fetched", "coins_excluded", "candidates_found",
         "candidates_suppressed_cooldown", "ai_calls_made", "alerts_generated",
-        "alerts_sent", "alerts_suppressed", "errors"), 0)
+        "alerts_sent", "alerts_suppressed", "errors", "v11_candidates", "v12_candidates",
+        "overlapping_candidates", "v12_only_candidates", "v11_ai_calls", "v12_ai_calls",
+        "v12_suppressed", "v12_only_already_moved", "v12_only_no_move_yet"), 0)
+    summary.update(detector=detector, social_status='disabled', news_status='on_demand_v11')
     conn = None
     scan_id = None
     try:
@@ -89,9 +100,22 @@ def run_scan(cfg):
         market_ts = save_markets(conn, markets, observed.isoformat())
         summary["coins_fetched"] = len(markets)
         fill_due_outcomes(conn, observed, cfg["outcomes"]["tolerance_seconds"])
+        try:
+            experiment_measurement.fill_outcomes(conn, observed, cfg)
+        except Exception as exc:
+            conn.rollback()
+            summary['errors'] += 1
+            log.error('Experimental measurement failed: %s',type(exc).__name__)
         candidates = []
+        records, stats_by_coin, news_cache = [], {}, {}
         for coin in markets:
-            hist = [dict(row) for row in history(conn, coin["id"]) if row["ts"] != market_ts]
+            hist = []
+            for row in history(conn, coin['id']):
+                historical_ts = datetime.fromisoformat(row['ts'])
+                if historical_ts.tzinfo is None:
+                    historical_ts = historical_ts.replace(tzinfo=timezone.utc)
+                if historical_ts < observed:
+                    hist.append(dict(row))
             stats = None
             if is_stablecoin(coin, cfg):
                 decision, reason = "excluded", "stablecoin"
@@ -104,6 +128,10 @@ def run_scan(cfg):
                 else:
                     decision, reason = "candidate", None
             eligible = decision == "candidate"
+            stats_by_coin[coin['id']] = stats
+            if detector == 'v12':
+                summary['coins_excluded'] += int(decision == 'excluded')
+                continue
             episode = update_episode(conn, coin["id"], eligible, observed, cfg)
             eid = conn.execute("""INSERT INTO candidate_evaluations
                 (scan_id,coin_id,market_ts,pre_score,features_json,decision,reason)
@@ -111,10 +139,18 @@ def run_scan(cfg):
                 stats["pre_score"] if stats else None,
                 json.dumps(stats, allow_nan=False) if stats else None, decision, reason)).lastrowid
             summary["coins_excluded"] += int(decision == "excluded")
+            records.append((coin, stats, eid, eligible))
             if eligible:
                 summary["candidates_found"] += 1
                 candidates.append((coin, stats, hist, eid, episode))
         conn.commit()
+        summary['v11_candidates'] = len(candidates)
+        try:
+            experiment.mirror_v11(conn, scan_id, records, markets, observed, market_ts, cfg)
+        except Exception as exc:
+            conn.rollback()
+            summary['errors'] += 1
+            log.error('Control measurement failed: %s',type(exc).__name__)
         candidates.sort(key=lambda item: item[1]["pre_score"], reverse=True)
         for coin, stats, hist, eid, episode in candidates:
             call_id = None
@@ -128,11 +164,11 @@ def run_scan(cfg):
                     reason = "cooldown"
                 elif summary["ai_calls_made"] >= cfg["ai"]["max_candidates_per_scan"]:
                     reason = "scan_limit"
-                elif conn.execute("SELECT COUNT(*) FROM ai_calls WHERE budget_date=?",
-                                  (now_utc().date().isoformat(),)).fetchone()[0] >= cfg["ai"]["daily_call_budget"]:
+                elif daily_usage(conn, now_utc().date().isoformat()) >= cfg["ai"]["daily_call_budget"]:
                     reason = "daily_budget"
                 if not reason:
                     news = recent_news(coin["name"], coin["symbol"], cfg["ai"]["max_news_items"])
+                    news_cache[coin['id']] = (news, now_utc())
                     request = build_request(coin, stats, news, hist, config_json, config_hash, market_ts, cfg["ai"])
                     call_id, reason = reserve_call(conn, eid, coin["id"], stats["pre_score"], now_utc(),
                         cfg["ai"], request["model"], json.dumps(request, ensure_ascii=False, allow_nan=False))
@@ -142,6 +178,7 @@ def run_scan(cfg):
                     summary["candidates_suppressed_cooldown"] += int(reason == "cooldown")
                     continue
                 summary["ai_calls_made"] += 1
+                summary['v11_ai_calls'] += 1
                 response = investigate(request, cfg["ai"]["timeout_seconds"])
                 # Persist raw output before validation, including refusals and malformed responses.
                 conn.execute("""UPDATE ai_calls SET response_json=?,returned_model=?,usage_json=? WHERE id=?""",
@@ -175,6 +212,16 @@ def run_scan(cfg):
                     conn.execute("UPDATE candidate_evaluations SET decision='failed',reason=? WHERE id=?",
                                  (type(exc).__name__, eid))
                 log.error("Candidate %s failed: %s", coin["id"], type(exc).__name__)
+        # Mirror the final V1.1 AI decision without changing its original record or dossier.
+        conn.execute('''UPDATE experiment_evaluations SET
+            decision=(SELECT decision FROM candidate_evaluations WHERE id=v11_evaluation_id),
+            reason=(SELECT reason FROM candidate_evaluations WHERE id=v11_evaluation_id)
+            WHERE scan_id=? AND signal_version='1.1' ''',(scan_id,))
+        conn.commit()
+        if detector in ('v12','all'):
+            experiment.run_detector(conn,scan_id,markets,stats_by_coin,market_ts,cfg,summary,
+                recent_news,investigate,validate_response,deliver_alerts,news_cache,social_provider,now_utc)
+        summary['candidates_found'] = summary['v11_candidates'] + summary['v12_candidates']
     except Exception as exc:
         if conn:
             conn.rollback()
@@ -199,6 +246,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--migrate-only", action="store_true")
+    parser.add_argument('--detector', choices=('v11','v12','all'))
     args = parser.parse_args()
     load_dotenv(ROOT / ".env")
     cfg = load_config()
@@ -212,6 +260,7 @@ def main():
         try:
             with conn:
                 conn.execute("UPDATE ai_calls SET status='interrupted',error='Process interrupted' WHERE status='reserved'")
+                conn.execute("UPDATE v12_ai_calls SET status='interrupted',error='Process interrupted' WHERE status='reserved'")
                 conn.execute("UPDATE alert_events SET status='delivery_unknown' WHERE status='reserved'")
                 conn.execute("UPDATE scan_runs SET status='interrupted' WHERE status='running'")
         finally:
@@ -221,7 +270,7 @@ def main():
             return
         while True:
             try:
-                summary = run_scan(cfg)
+                summary = run_scan(cfg, args.detector)
                 if args.once:
                     raise SystemExit(1 if summary["errors"] else 0)
                 time.sleep(cfg["scan_interval_seconds"])

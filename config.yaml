@@ -39,3 +39,44 @@ logging:
 
 database:
   path: data/crypto_radar.db
+
+# Explicit --detector v11|v12|all overrides this switch. Deployment is opt-in.
+v12:
+  enabled: false
+  max_market_age_seconds: 600
+  social:
+    enabled: false
+    provider: none
+    baseline_hours: 24
+    min_baseline_windows: 12
+    min_coverage: 0.8
+    max_duplicate_fraction: 0.5
+    max_top_author_fraction: 0.5
+  news:
+    enabled: true
+    assets_per_scan: 10
+    poll_minutes: 30
+    max_age_hours: 24
+    novelty_hours: 6
+    max_items: 8
+    trusted_sources: []
+  scoring:
+    social_threshold: 40
+    news_threshold: 35
+    candidate_threshold: 35
+  ai:
+    enabled: false
+    max_candidates_per_scan: 2
+    daily_call_budget: 10
+  alerts:
+    enabled: false
+  market_regime:
+    broad_enabled: true
+    min_broad_assets: 10
+  significant_move:
+    threshold_pct: 5.0
+    window_hours: 24
+    lookback_hours: 1
+    anchor_tolerance_seconds: 600
+  episodes:
+    quiet_hours: 24

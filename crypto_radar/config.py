@@ -26,6 +26,9 @@ DEFAULTS = {
 
 
 def normalize(raw):
+    from .experiment_config import normalize as normalize_v12
+    raw = dict(raw)
+    experimental = normalize_v12(raw.pop('v12', {}))
     cfg = copy.deepcopy(DEFAULTS)
     for key, value in raw.items():
         if key not in cfg:
@@ -75,6 +78,7 @@ def normalize(raw):
         raise ValueError("Score thresholds must be 0..100")
     if cfg["logging"]["max_bytes"] <= 0 or cfg["logging"]["backup_count"] < 1:
         raise ValueError("Log rotation requires a positive size and backup count")
+    cfg['v12'] = experimental
     return cfg
 
 

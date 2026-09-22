@@ -61,7 +61,7 @@ class GmailRelay:
         return "250 OK"
 
     def forward(self, data, recipients):
-        with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as smtp:
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as smtp:
             smtp.ehlo()
             smtp.starttls(context=ssl.create_default_context())
             smtp.ehlo()
@@ -104,7 +104,7 @@ def main():
     logging.getLogger("mail.log").setLevel(logging.CRITICAL)
     controller = Controller(GmailRelay(username, password, sender, recipients),
         hostname="127.0.0.1", port=port, enable_SMTPUTF8=False,
-        data_size_limit=100000, ready_timeout=10)
+        data_size_limit=25000000, ready_timeout=10)
     controller.start()
     log.info("Local Gmail relay listening on 127.0.0.1:%s", port)
     try:

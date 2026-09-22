@@ -5,3 +5,4 @@ openai>=3.14,<4
 pydantic>=2.12,<3
 feedparser>=6.0,<7
 aiosmtpd>=1.4.6,<2
+google-auth-oauthlib>=1.2,<2

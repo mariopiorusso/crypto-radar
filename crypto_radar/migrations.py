@@ -4,7 +4,7 @@ from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
-VERSION = 1
+VERSION = 2
 STATEMENTS = [
     "CREATE TABLE schema_migrations (version INTEGER PRIMARY KEY, applied_ts TEXT NOT NULL)",
     "ALTER TABLE market_observations ADD COLUMN source_updated_ts TEXT",
@@ -37,15 +37,18 @@ def migrate(conn, path):
     if version == VERSION:
         return None
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-    backup_path = Path(path).with_name(Path(path).name + f".before-v1.1-{stamp}.bak")
+    backup_path = Path(path).with_name(Path(path).name + f".before-schema-{VERSION}-{stamp}.bak")
     with closing(sqlite3.connect(backup_path)) as backup:
         conn.backup(backup)
     conn.execute("BEGIN IMMEDIATE")
     try:
-        for statement in STATEMENTS:
-            conn.execute(statement)
-        conn.execute("INSERT INTO schema_migrations VALUES (?, ?)",
-                     (VERSION, datetime.now(timezone.utc).isoformat()))
+        from .experiment_schema import STATEMENTS as V12_STATEMENTS
+        for target, statements in ((1, STATEMENTS), (2, V12_STATEMENTS)):
+            if version < target:
+                for statement in statements:
+                    conn.execute(statement)
+                conn.execute("INSERT INTO schema_migrations VALUES (?, ?)",
+                             (target, datetime.now(timezone.utc).isoformat()))
         conn.execute(f"PRAGMA user_version={VERSION}")
         conn.commit()
     except BaseException:

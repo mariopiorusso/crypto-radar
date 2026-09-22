@@ -2,6 +2,11 @@ import hashlib
 from datetime import datetime
 
 
+def daily_usage(conn, date):
+    return sum(conn.execute(f'SELECT COUNT(*) FROM {table} WHERE budget_date=?', (date,)).fetchone()[0]
+               for table in ('ai_calls','v12_ai_calls'))
+
+
 def cooldown_allowed(conn, coin_id, score, now, cfg):
     last = conn.execute("SELECT reserved_ts, pre_score FROM ai_calls WHERE coin_id=? ORDER BY id DESC LIMIT 1", (coin_id,)).fetchone()
     if not last:
@@ -16,7 +21,7 @@ def reserve_call(conn, evaluation_id, coin_id, score, now, cfg, model, dossier):
         if not cooldown_allowed(conn, coin_id, score, now, cfg):
             conn.rollback()
             return None, "cooldown"
-        count = conn.execute("SELECT COUNT(*) FROM ai_calls WHERE budget_date=?", (now.date().isoformat(),)).fetchone()[0]
+        count = daily_usage(conn, now.date().isoformat())
         if count >= cfg["daily_call_budget"]:
             conn.rollback()
             return None, "daily_budget"
@@ -52,7 +57,7 @@ def update_episode(conn, coin_id, eligible, now, cfg):
     return episode
 
 
-def reserve_alert(conn, assessment_id, coin_id, episode, channel, score, text, now, increase):
+def reserve_alert(conn, assessment_id, coin_id, episode, channel, score, text, now, increase, research_episode_id=None):
     conn.execute("BEGIN IMMEDIATE")
     try:
         last = conn.execute("""SELECT MAX(score) FROM alert_events WHERE coin_id=? AND episode=?
@@ -61,10 +66,19 @@ def reserve_alert(conn, assessment_id, coin_id, episode, channel, score, text, n
         if last is not None and score < last + increase:
             conn.rollback()
             return None
+        if research_episode_id is not None:
+            shared = conn.execute('''SELECT MAX(score) FROM alert_events WHERE research_episode_id=?
+                AND channel=? AND status IN ('reserved','sent','delivery_unknown','console')''',
+                (research_episode_id,channel)).fetchone()[0]
+            if shared is not None and score < shared+increase:
+                conn.rollback()
+                return None
         cur = conn.execute("""INSERT OR IGNORE INTO alert_events
             (assessment_id,coin_id,episode,channel,score,fingerprint,attempted_ts,status)
             VALUES (?,?,?,?,?,?,?,'reserved')""", (assessment_id, coin_id, episode, channel,
             score, hashlib.sha256(text.encode()).hexdigest(), now.isoformat()))
+        if cur.rowcount and research_episode_id is not None:
+            conn.execute('UPDATE alert_events SET research_episode_id=? WHERE id=?',(research_episode_id,cur.lastrowid))
         conn.commit()
         return cur.lastrowid if cur.rowcount else None
     except BaseException:

@@ -287,7 +287,7 @@ class ScanTests(DatabaseCase):
             client=smtp.return_value.__enter__.return_value
             client.send_message.return_value={}
             email.send_alert('Test')
-            smtp.assert_called_once_with('127.0.0.1',1025,timeout=60)
+            smtp.assert_called_once_with('127.0.0.1',1025,timeout=180)
             client.starttls.assert_not_called()
             client.login.assert_not_called()
 

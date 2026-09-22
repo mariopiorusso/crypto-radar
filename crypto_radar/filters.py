@@ -4,6 +4,7 @@ DEFAULT_STABLECOINS = [
     "first-digital-usd", "paypal-usd", "frax", "pax-dollar", "gemini-dollar",
     "binance-usd", "eurc", "euro-coin", "staked-ethena-usde", "savings-usds",
     "usual-usd", "usd0", "usdx-money-usdx", "ripple-usd", "global-dollar",
+    "usd1-wlfi", "usd1", "bfusd",
 ]
 
 

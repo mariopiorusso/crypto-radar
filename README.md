@@ -1,4 +1,10 @@
-# Crypto Radar V1.1
+# Crypto Radar V1.2 / V1.1 control
+
+V1.2 adds a parallel, opt-in news/social research detector. Read
+[the V1.2 experiment and deployment guide](docs/V1.2.md) for configuration,
+migration, measurement definitions, Windows commands and the validation protocol.
+The existing scheduled scanner is not automatically changed by this update.
+Social has no live adapter yet; V1.2 AI and alerts default to disabled.
 
 Experimental early-warning research engine for crypto market anomalies.
 
@@ -88,6 +94,19 @@ TELEGRAM_CHAT_ID=...
 If these are blank, alerts are printed to the console only.
 
 ## Run automatically after Windows reboot
+
+For this Windows installation, run `install_startup_tasks.ps1` once as administrator.
+It installs `Crypto Radar - Mail Relay` and `Crypto Radar - Scanner` as boot tasks
+under LOCAL SERVICE, with 30/90-second startup delays, no execution time limit,
+and one-minute restarts after process failures (up to 999 retries). Both run before
+sign-in and without a stored Windows password. The account receives read access
+to the project and Python runtime, and modify access to `data` and `logs`.
+The installer hands existing processes over to Task Scheduler and starts both tasks.
+Do not also start manual instances. To stop them, use Task Scheduler's End command;
+to prevent the next boot startup, disable the two tasks. Sleep/hibernation still
+pauses the engine; this setup does not change Windows power settings.
+
+The following manual setup is an alternative for other installations:
 
 First verify the continuous process works. Then open **Task Scheduler** and create a task:
 
@@ -282,7 +301,64 @@ The dependency lock records the tested Windows/Python 3.14.7 environment. Python
 has not been tested for this release. Keep the existing interpreter unless a verified
 compatibility issue requires a change.
 
-## Phase 2
+## Weekly file email
+
+`Crypto Radar - Weekly Files` emails `EMAIL_TO` every Monday at **09:00 Windows
+local time**, including after a missed start when the PC becomes available.
+Install/update it with `install_weekly_report_task.ps1` as administrator; use
+`-At '10:00'` to change its time. This is independent of market alert thresholds.
+
+The ZIP includes exactly `data/crypto_radar.db`, `config.yaml`, and
+`crypto_radar/intelligence/statistical.py`. The database is captured with SQLite's
+online backup API and checked for integrity. `.env` is never included. ZIPs and
+per-week delivery records remain in `data/weekly-reports`; logs are in
+`logs/weekly-report.log`. Large ZIPs are split into 12 MB numbered attachments
+across separate emails, with reassembly instructions and a SHA-256 checksum.
+Keep all parts to reconstruct the original ZIP. Local report archives are retained.
+
+Preview without sending: `python -m crypto_radar.weekly_report --dry-run`.
+Send manually: `python -m crypto_radar.weekly_report`. A successful weekly send
+is not repeated that ISO week. Uncertain delivery is recorded and requires checking
+the inbox before a manual retry, rather than risking duplicate emails.
+
+## Phase 2 roadmap
+
+### Google Drive delivery (requires setup)
+
+`python -m crypto_radar.weekly_report --drive` uploads a single ZIP named
+`crypto-radar-YYYY-MM-DDTHHMMSSZ.zip` (UTC timestamp), with the same three files.
+`--drive --dry-run` builds a ZIP without authenticating or uploading.
+The authenticated account must match `GOOGLE_DRIVE_ACCOUNT`, and the existing
+destination folder must match `GOOGLE_DRIVE_FOLDER_ID` from a `/folders/` URL.
+The browser `/u/2/home` address cannot identify a destination folder or account.
+
+The unattended task requires its own Google Drive OAuth authorization:
+`GOOGLE_DRIVE_CLIENT_ID`, `GOOGLE_DRIVE_CLIENT_SECRET`, and
+`GOOGLE_DRIVE_REFRESH_TOKEN` belong in the untracked `.env` or environment.
+The Gmail app password and the chat's Google Drive connector cannot substitute
+for these credentials. Enable Drive API for the OAuth client and authorize access
+to the chosen folder. No credentials are written to upload state or logs.
+
+For one-time desktop OAuth authorization, run
+`python -m crypto_radar.authorize_drive "C:\path\to\client_secret.json"`.
+Sign in with the configured account in the browser. The helper verifies the
+account and target folder, then stores the client credentials and refresh token
+in `.env` without displaying them. It requests Google Drive access for the existing
+folder; Google displays the scope on its consent page. An OAuth app left in Google's
+external Testing mode may require reauthorization after seven days; configure its
+publishing status appropriately for unattended weekly operation.
+
+After authorization and a successful upload check, run
+`install_weekly_report_task.ps1 -Drive` as administrator to switch the existing
+Monday 09:00 task to Drive instead of email. Until then its existing email action
+is unchanged. Market alert emails are independent and remain available.
+The uploader verifies the account, writable folder, remote filename, size and
+checksum, records SHA-256 metadata, and saves a Drive file ID before uploading
+so a retry can recover an accepted upload without creating another copy.
+Drive delivery state is separate from legacy email state. Archives stay private
+under the existing folder's permissions; no public sharing links are created.
+
+## Future signals
 
 After V1 has run reliably:
 
