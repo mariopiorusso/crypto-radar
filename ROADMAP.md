@@ -145,6 +145,19 @@ baselines across regimes, with monitoring for drift and abstention when uncertai
 
 ## Evidence gates and decisions
 
+### Analysis artifacts
+
+The [compact analysis exporter](docs/ANALYSIS_SNAPSHOT.md) creates a separate
+SQLite research artifact from a read-only consistent backup of the authoritative
+database. It keeps recent detailed evidence (default 12 weeks), complete connected
+episodes/outcomes/benchmark and news relationships, raw market/social context,
+and explicit older descriptive summaries. Original query names remain SQLite
+views over losslessly interned text. Metadata exposes counts, cutoff extensions,
+missingness and integrity checks. No live pruning or weekly-worker change is
+implied; this is analysis infrastructure, not milestone promotion or scientific
+validation. Inspect completeness and repeated-episode counts before using the
+artifact for the evidence gates below.
+
 1. **Engineering/data gate:** offline tests, valid schemas, preserved evidence,
    timestamp integrity, adequate coverage, bounded cost and reliable outcomes.
    Fixtures validate mechanics, not provider quality or predictive power.

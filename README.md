@@ -368,3 +368,13 @@ After V1 has run reliably:
 4. Add social velocity source.
 5. Backtest thresholds and calibrate the score.
 6. Add dashboard.
+# Compact research export
+
+Create a standalone analysis database without changing the live scanner:
+
+```powershell
+python -m crypto_radar.analysis_snapshot --source C:\crypto-radar\data\crypto_radar.db --history-days 84 --zip
+```
+
+See [analysis snapshot guide](docs/ANALYSIS_SNAPSHOT.md) for retention, integrity,
+query views, diagnostics and limitations. This does not change weekly scheduling.
