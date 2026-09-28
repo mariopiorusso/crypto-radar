@@ -91,7 +91,7 @@ TELEGRAM_BOT_TOKEN=...
 TELEGRAM_CHAT_ID=...
 ```
 
-If these are blank, alerts are printed to the console only.
+If these are blank, alert output is written to the log file.
 
 ## Run automatically after Windows reboot
 
@@ -243,7 +243,7 @@ reset the below-threshold timer, so downtime never establishes a reset.
 
 Delivery errors do not stop the other channel or the scan. Uncertain/partial deliveries
 are recorded as `delivery_unknown` and are not blindly retried, to avoid duplicates.
-When neither channel is configured, alerts fall back to the console with the same
+When neither channel is configured, alerts fall back to the log file with the same
 deduplication. Enabling email without required connection/address settings logs an error.
 
 ### Outcome semantics

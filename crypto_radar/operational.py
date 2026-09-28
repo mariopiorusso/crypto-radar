@@ -7,7 +7,7 @@ from contextlib import contextmanager
 def setup_logging(cfg):
     path = Path(cfg["path"])
     path.parent.mkdir(parents=True, exist_ok=True)
-    handlers = [logging.StreamHandler(), RotatingFileHandler(path, maxBytes=cfg["max_bytes"],
+    handlers = [RotatingFileHandler(path, maxBytes=cfg["max_bytes"],
                 backupCount=cfg["backup_count"], encoding="utf-8")]
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s",
                         handlers=handlers, force=True)

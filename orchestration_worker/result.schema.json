@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["outcome", "repository_detected", "branch", "head", "test_status", "github_access_status", "summary"],
+  "properties": {
+    "outcome": {"type": "string", "enum": ["COMPLETED", "BLOCKED", "FAILED"]},
+    "repository_detected": {"type": "boolean"},
+    "branch": {"type": ["string", "null"]},
+    "head": {"type": ["string", "null"]},
+    "test_status": {"type": "string"},
+    "github_access_status": {"type": "string"},
+    "summary": {"type": "string"}
+  }
+}

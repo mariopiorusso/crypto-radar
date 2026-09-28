@@ -1,0 +1,11 @@
+From: Trusted Sender <trusted@example.invalid>
+To: cryptoradar128@gmail.com
+Subject: [CRADAR TASK] HANDSHAKE-001
+Authentication-Results: mx.google.com; dmarc=pass header.from=example.invalid
+Content-Type: text/plain; charset=utf-8
+
+MODE: TEST
+TASK_ID: HANDSHAKE-001
+
+Inspect C:\crypto-radar. Do not modify anything.
+Return repository detected, branch, HEAD, test availability and GitHub access status.

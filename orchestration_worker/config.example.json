@@ -1,0 +1,21 @@
+{
+  "mailbox": "cryptoradar128@gmail.com",
+  "reply_enabled": true,
+  "engineering_enabled": false,
+  "engineering_repository": "",
+  "publish_remote": "",
+  "windows_sandbox": "unelevated",
+  "engineering_timeout_seconds": 1200,
+  "allowed_senders": [],
+  "repository": "C:\\crypto-radar",
+  "codex_executable": "C:\\PATH\\TO\\codex.exe",
+  "credentials_path": "credentials.json",
+  "token_path": "token.json",
+  "state_path": "state/worker.db",
+  "log_path": "logs",
+  "report_path": "reports",
+  "lookback_days": 7,
+  "max_messages": 500,
+  "max_tasks_per_poll": 1,
+  "timeout_seconds": 300
+}

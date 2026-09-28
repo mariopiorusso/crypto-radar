@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+config.json
+credentials.json
+token.json*
+state/
+logs/
+reports/
+snapshots/
+workspaces/
