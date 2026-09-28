@@ -368,6 +368,7 @@ After V1 has run reliably:
 4. Add social velocity source.
 5. Backtest thresholds and calibrate the score.
 6. Add dashboard.
+<<<<<<< HEAD
 
 ### Monday Drive snapshot confirmation
 
@@ -401,3 +402,15 @@ Confirmation still uses the existing email configuration and includes the Drive
 link and SHA-256. Logs remain in `logs/weekly-report.log`. ZIP-LZMA can be extracted
 with Python zipfile or 7-Zip. Install/update this schedule as administrator with:
 `./install_weekly_report_task.ps1 -At 19:00 -Drive -Notify -Analysis`.
+=======
+# Compact research export
+
+Create a standalone analysis database without changing the live scanner:
+
+```powershell
+python -m crypto_radar.analysis_snapshot --source C:\crypto-radar\data\crypto_radar.db --history-days 84 --zip
+```
+
+See [analysis snapshot guide](docs/ANALYSIS_SNAPSHOT.md) for retention, integrity,
+query views, diagnostics and limitations. This does not change weekly scheduling.
+>>>>>>> 454f52ef7edd0e303744bee01fcd799868c918fd
