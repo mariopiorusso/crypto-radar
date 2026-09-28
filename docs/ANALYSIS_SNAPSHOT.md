@@ -127,6 +127,10 @@ silently sampling evidence to meet a connector limit.
 
 ## Analytical limitations / next gate
 
+Use the [offline episode report](EPISODE_REPORT.md) for deterministic weekly
+statistics that average repeated evaluations within episodes before cohort
+comparisons, with explicit outcome, benchmark, timing and social missingness.
+
 - This preserves recorded evidence, not evidence the collectors never gathered.
   Unavailable social collection does not support social predictive claims.
 - Existing market sampling gaps remain; endpoint returns do not prove every
