@@ -323,3 +323,99 @@ requires a configured `publish_remote`, a worker/* branch and an exact matching 
 The publisher rejects unexpected local Git configuration, disables hooks, pins the
 credential helper and destination, never forces a push, and verifies the remote SHA.
 Failures remain BLOCKED with local work preserved. It does not deploy to the scanner.
+
+## Create GitHub issues
+
+Send a trusted tagged email with this body:
+
+```text
+ACTION: CREATE_ISSUE
+SOURCE: ROADMAP
+ISSUE_KEY: roadmap-tracking
+TITLE: Crypto Radar roadmap: evidence-gated development plan
+```
+
+For other issues, replace SOURCE with a BODY: line followed by Markdown text.
+TITLE is required for custom issues. Optional LABELS accepts comma-separated existing
+labels. Only the configured publish_remote GitHub repository is used. The supervisor
+uses Git Credential Manager; credentials are not passed to Codex or written to logs.
+The issue URL is returned in the email reply. No Codex run is required.
+ISSUE_KEY deduplicates across emails; without it deduplication is per Gmail message.
+Creation is recorded before POST. An uncertain delivery is never automatically retried;
+inspect state/issues and GitHub before retrying. Reusing a completed key returns the
+existing issue. Tests mock GitHub and never create real issues.
+
+### Look up an issue or post a comment
+
+GitHub issue operations use the supervisor's existing credential helper and pinned
+repository. No new token or GitHub CLI is required; credentials are not supplied to
+Codex. Send a new email from an allowed sender with `[CRADAR TASK]` in its subject.
+
+Read-only lookup:
+```text
+ACTION: LOOKUP_ISSUE
+ISSUE_NUMBER: 2
+```
+
+Post supplied Markdown:
+```text
+ACTION: COMMENT_ISSUE
+ISSUE_NUMBER: 2
+COMMENT_KEY: roadmap-review-001
+BODY:
+Your comment here.
+```
+
+Ask the engineering agent to review code and post its findings:
+```text
+POST_COMMENT: YES
+ISSUE_NUMBER: 2
+COMMENT_KEY: roadmap-review-002
+
+Review ROADMAP.md against the current source and summarize current progress,
+remaining gaps and the next steps. Put the review in your final summary.
+```
+
+For the generated review, do not add ACTION: COMMENT_ISSUE: that action sends the
+supplied BODY directly. The supervisor first verifies the issue, runs the agent,
+and posts its summary only on a COMPLETED outcome. The email reply includes the
+comment URL. A failed or blocked review is not posted. Issue numbers refer only
+to the configured repository; pull requests are rejected.
+
+COMMENT_KEY is optional; use a new key for each distinct comment. Reusing a key
+for the same issue returns the original result without posting again. Without a
+key, deduplication uses the Gmail message ID. Delivery state is persisted under
+state/issue_comments before POST. An interrupted or ambiguous delivery is blocked
+from automatic retries; inspect GitHub before recovery. Previously failed emails
+are not automatically replayed: send a new request with the fields above.
+
+Explicit roadmap authorization is also accepted without template fields when the
+request contains the standalone instruction "Update the existing Crypto Radar
+roadmap GitHub issue with a fresh development-status comment." and exactly one
+issue URL in the configured repository. Conflicting targets are not inferred.
+Issue lookup supplies body and creation/update dates to the review agent.
+
+Structured roadmap review emails are supported as well:
+```text
+TASK_ID=ROADMAP-STATUS-005
+TASK_TYPE=ROADMAP_STATUS_UPDATE
+TARGET=github_issue_2
+```
+This requests a read-only source/roadmap review followed by one status comment on
+issue 2 in the configured GitHub repository. No code changes or pushes are made.
+Duplicate or conflicting task types/targets are rejected. The normal authenticated
+sender checks, comment delivery tracking and email response mechanism apply.
+
+### Engineering delivery instructions
+
+Structured `TASK_TYPE=ENGINEERING` emails can explicitly request publication in a
+`GIT` section (for example, `Work on a worker/* branch, commit, push, and create a
+PR for owner review. DO NOT merge the PR.`), and a comment in a `ROADMAP` section
+(for example, `Add one concise status comment to GitHub issue #2 ...`). The worker
+normalizes those direct instructions into delivery fields before invoking Codex.
+Explicit NO fields take precedence; conditional or quoted instructions are not
+inferred. Conflicting issue targets fail validation. Existing explicit
+`PUBLISH: YES`, `CREATE_PR: YES`, `POST_COMMENT: YES`, `ISSUE_NUMBER: 2` fields also
+remain available. Delivery runs in order: verified push, review PR, issue comment.
+PR creation has persistent at-most-once attempt tracking; ambiguous sends require
+inspection. Credentials remain in the supervisor. No automatic PR merge occurs.

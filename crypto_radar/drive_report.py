@@ -12,6 +12,7 @@ import requests
 from .config import ROOT
 from .operational import process_lock
 from .weekly_report import build_archive, save_state
+from .alerts.email import send_alert
 
 API = "https://www.googleapis.com/drive/v3"
 FIELDS = "id,name,parents,mimeType,md5Checksum,size,webViewLink,trashed"
@@ -95,18 +96,29 @@ class DriveClient:
         return result.json()
 
 
-def run_drive_report(root=ROOT, dry_run=False, now=None):
+def run_drive_report(root=ROOT, dry_run=False, now=None, notify=False, analysis=False, history_days=84):
     root = Path(root)
     now = now or datetime.now(timezone.utc)
     year, week, _ = now.astimezone().date().isocalendar()
     directory = root / "data" / "weekly-reports"
     directory.mkdir(parents=True, exist_ok=True)
-    if dry_run:
+    prefix = 'crypto-radar-analysis' if analysis else 'crypto-radar'
+    def build():
+        if analysis:
+            from .analysis_snapshot import export_snapshot
+            destination = directory / f"{prefix}-{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%S%fZ')}.db"
+            result = export_snapshot(root / 'data/crypto_radar.db', destination,
+                                     history_days=history_days, zipped=True, as_of=now)
+            return Path(result['zip_path'])
         return build_archive(root, directory / f"crypto-radar-{now.strftime('%Y-%m-%dT%H%M%SZ')}.zip")
+    if dry_run:
+        return build()
     with process_lock(directory / "weekly-report"), DriveClient() as client:
-        state_path = directory / f"crypto-radar-{year}-W{week:02}.drive.json"
+        state_path = directory / f"{prefix}-{year}-W{week:02}.drive.json"
         state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else None
         if state:
+            if analysis and state.get('history_days') != history_days:
+                raise ValueError('History window changed; review this week\'s saved analysis state')
             if state["folder"] != client.folder or state["account"] != client.account:
                 raise ValueError("Destination changed since this week's archive was prepared; review saved state")
             filename = state["filename"]
@@ -114,10 +126,15 @@ def run_drive_report(root=ROOT, dry_run=False, now=None):
                 raise ValueError("Invalid stored archive filename")
             path = directory / filename
         else:
-            path = build_archive(root, directory / f"crypto-radar-{now.strftime('%Y-%m-%dT%H%M%SZ')}.zip")
+            path = build()
             sha256, md5 = checksums(path)
             state = {"filename": path.name, "sha256": sha256, "md5": md5, "size": path.stat().st_size,
-                     "folder": client.folder, "account": client.account, "file_id": client.generate_id(), "status": "ready"}
+                     "folder": client.folder, "account": client.account, "file_id": None, "status": "ready"}
+            if analysis:
+                state.update(artifact_kind='analysis', history_days=history_days)
+            save_state(state_path, state)
+        if not state.get('file_id'):
+            state['file_id'] = client.generate_id()
             save_state(state_path, state)
         if checksums(path) != (state["sha256"], state["md5"]):
             raise ValueError("Local archive changed; refusing to upload different content")
@@ -132,4 +149,17 @@ def run_drive_report(root=ROOT, dry_run=False, now=None):
             raise ValueError("Drive file verification failed")
         state.update(status="uploaded", web_view_link=remote.get("webViewLink"))
         save_state(state_path, state)
+        if notify and state.get('notification') != 'sent':
+            if state.get('notification') == 'dispatching':
+                raise RuntimeError('Confirmation delivery uncertain; inspect mailbox before retrying')
+            state['notification'] = 'dispatching'
+            save_state(state_path, state)
+            link = 'https://drive.google.com/file/d/' + state['file_id'] + '/view'
+            send_alert(f"Crypto Radar snapshot created and uploaded successfully.\n\n"
+                       f"File: {path.name}\nSize: {state['size']} bytes\n"
+                       f"SHA-256: {state['sha256']}\nGoogle Drive: {link}\n\n"
+                       "SQLite snapshot passed its integrity check; uploaded size and checksum verified.",
+                       subject='Crypto Radar weekly snapshot confirmed')
+            state['notification'] = 'sent'
+            save_state(state_path, state)
         return path

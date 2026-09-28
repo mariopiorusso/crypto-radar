@@ -1,4 +1,4 @@
-param([string]$At = '09:00', [switch]$Drive)
+param([string]$At = '09:00', [switch]$Drive, [switch]$Notify, [switch]$Analysis)
 $ErrorActionPreference = 'Stop'
 $reportRoot = $PSScriptRoot
 $reportIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -8,6 +8,14 @@ if (-not $reportPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Admi
 }
 $reportArguments = '-B -m crypto_radar.weekly_report'
 if ($Drive) { $reportArguments += ' --drive' }
+if ($Analysis) {
+    if (-not $Drive) { throw '-Analysis requires -Drive' }
+    $reportArguments += ' --analysis --history-days 84'
+}
+if ($Notify) {
+    if (-not $Drive) { throw '-Notify requires -Drive' }
+    $reportArguments += ' --notify'
+}
 $reportAction = New-ScheduledTaskAction -Execute (Join-Path $reportRoot '.venv\Scripts\python.exe') `
     -Argument $reportArguments -WorkingDirectory $reportRoot
 $reportTrigger = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Monday -At $At
@@ -17,7 +25,7 @@ $reportSettings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -Sta
 $reportAccount = New-ScheduledTaskPrincipal -UserId 'S-1-5-19' -LogonType ServiceAccount -RunLevel Limited
 $reportName = 'Crypto Radar - Weekly Files'
 Register-ScheduledTask -TaskName $reportName -Action $reportAction -Trigger $reportTrigger `
-    -Settings $reportSettings -Principal $reportAccount -Description 'Deliver a consistent database snapshot, config.yaml and statistical.py every Monday.' -Force | Out-Null
+    -Settings $reportSettings -Principal $reportAccount -Description 'Create a weekly Crypto Radar snapshot, upload to configured Drive when enabled, and optionally email confirmation.' -Force | Out-Null
 $reportService = New-Object -ComObject 'Schedule.Service'
 $reportService.Connect()
 $reportTask = $reportService.GetFolder('\').GetTask($reportName)

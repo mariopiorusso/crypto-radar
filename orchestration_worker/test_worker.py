@@ -407,6 +407,21 @@ class WorkerTests(unittest.TestCase):
             worker.run_codex(self.cfg,{'task_id':'TEST','request_text':'ACTION: SNAPSHOT'})
             self.assertEqual(snapshot.call_args.args[0]['repository'],str(self.repo))
 
+    def test_review_comment_requires_marker_and_updates_reply(self):
+        self.cfg['publish_remote']='https://github.com/example/repo'
+        def result(cfg,task):
+            data=self.fake(cfg,task); data['engineering']=True
+            return data
+        with patch('issue_action.comment',return_value={'url':'https://github.com/example/repo/issues/2#issuecomment-123'}) as post:
+            worker.poll(self.cfg,[self.message()],result)
+            post.assert_not_called()
+            raw=self.raw.replace(b'HANDSHAKE-001',b'HANDSHAKE-002')+b'\nPOST_COMMENT: YES\nISSUE_NUMBER: 2\n'
+            worker.poll(self.cfg,[self.message('comment',raw)],result)
+            post.assert_called_once()
+            self.assertIn('ISSUE_NUMBER: 2',post.call_args.args[1]['request_text'])
+        reports=[json.loads(p.read_text()) for p in (self.root/'reports').glob('*.json')]
+        self.assertTrue(any('Comment posted:' in r['github_access_status'] for r in reports))
+
     def test_publication_requires_marker_and_updates_reply(self):
         def result(cfg,task):
             data=self.fake(cfg,task)

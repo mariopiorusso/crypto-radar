@@ -112,13 +112,21 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="Build and inspect the ZIP without sending email")
     parser.add_argument("--drive", action="store_true", help="Upload one timestamped ZIP to Google Drive instead of emailing")
+    parser.add_argument("--notify", action="store_true", help="Email confirmation after a verified Drive upload")
+    parser.add_argument("--analysis", action="store_true", help="Upload compact analysis SQLite ZIP (requires --drive)")
+    parser.add_argument("--history-days", type=int, default=84)
     args = parser.parse_args()
+    if args.analysis and not args.drive:
+        parser.error('--analysis requires --drive')
+    if args.history_days < 1:
+        parser.error('--history-days must be positive')
     load_dotenv(ROOT / ".env")
     setup_logging({"path": str(ROOT / "logs/weekly-report.log"), "max_bytes": 1000000, "backup_count": 3})
     try:
         if args.drive:
             from .drive_report import run_drive_report
-            archive = run_drive_report(dry_run=args.dry_run)
+            archive = run_drive_report(dry_run=args.dry_run, notify=args.notify,
+                                       analysis=args.analysis, history_days=args.history_days)
             log.info("Drive report %s: %s", "prepared" if args.dry_run else "uploaded and verified", archive.name)
         else:
             run_report(dry_run=args.dry_run)

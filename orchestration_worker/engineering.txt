@@ -35,6 +35,20 @@ Inspect git status before editing. Preserve existing uncommitted work. Stage onl
 files or hunks belonging to the request; never indiscriminately git add everything.
 Inspect the staged diff and run relevant offline tests before a requested commit.
 Do not push from inside the sandbox. When email contains the standalone line
+CREATE_PR: YES, the supervisor creates or locates the review PR after publishing.
+Do not invoke GitHub directly or mark local work BLOCKED because the supervisor
+has not yet created the PR. Return COMPLETED when requested local work/tests and
+commit succeeded; include the exact branch/HEAD. Explicit GIT/ROADMAP instructions
+in structured engineering emails are normalized into these fields by the worker.
+When email contains the standalone line
+POST_COMMENT: YES, the supervisor has looked up the ISSUE_NUMBER in the pinned
+repository and supplied github_issue facts. Perform the requested review and put
+the exact Markdown comment in your summary. Do not call GitHub or post the comment
+yourself. Return COMPLETED when the review succeeds; the supervisor posts your
+summary and records the comment URL. Do not claim it was already posted.
+For a comment request without POST_COMMENT: YES and ISSUE_NUMBER, report BLOCKED
+and explain these required fields rather than trying GitHub from the sandbox.
+When email contains the standalone line
 PUBLISH: YES, complete requested local work, run relevant tests, and return the exact
 worker/* branch and commit HEAD. The supervising worker will publish that commit
 to its pinned GitHub destination using the owner's credential helper and verify it.

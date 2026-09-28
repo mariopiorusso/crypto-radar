@@ -49,6 +49,34 @@ class DriveReportTests(unittest.TestCase):
         self.assertEqual(state['status'],'uploaded')
         self.assertEqual(state['sha256'],checksums(path)[0])
 
+    def test_analysis_upload_uses_exporter_and_separate_weekly_state(self):
+        full=run_drive_report(self.root,now=self.now)
+        def export(source, destination, **kwargs):
+            self.assertEqual(source,self.root/'data/crypto_radar.db')
+            self.assertEqual(kwargs['history_days'],84)
+            self.assertTrue(kwargs['zipped'])
+            path=destination.with_suffix('.zip');path.write_bytes(b'analysis-zip')
+            return {'zip_path':str(path)}
+        with patch('crypto_radar.analysis_snapshot.export_snapshot',side_effect=export) as exporter, \
+             patch('crypto_radar.drive_report.send_alert') as mail:
+            path=run_drive_report(self.root,now=self.now,analysis=True,notify=True)
+            self.assertNotEqual(path,full)
+            self.assertTrue(path.name.startswith('crypto-radar-analysis-'))
+            self.client.existing.return_value=self.remote
+            self.assertEqual(run_drive_report(self.root,now=self.now,analysis=True,notify=True),path)
+            exporter.assert_called_once();mail.assert_called_once()
+            with self.assertRaisesRegex(ValueError,'History window changed'):
+                run_drive_report(self.root,now=self.now,analysis=True,history_days=7)
+        self.assertEqual(len(list(path.parent.glob('*.drive.json'))),2)
+
+    def test_analysis_dry_run_never_uploads_or_emails(self):
+        path=self.root/'analysis.zip'
+        with patch('crypto_radar.analysis_snapshot.export_snapshot',return_value={'zip_path':str(path)}), \
+             patch('crypto_radar.drive_report.DriveClient') as drive, \
+             patch('crypto_radar.drive_report.send_alert') as mail:
+            self.assertEqual(run_drive_report(self.root,analysis=True,dry_run=True,notify=True),path)
+            drive.assert_not_called();mail.assert_not_called()
+
     def test_response_loss_recovers_reserved_id(self):
         original = self.client.upload.side_effect
         def lost(*args):
@@ -60,6 +88,29 @@ class DriveReportTests(unittest.TestCase):
         self.client.existing.return_value = self.remote
         run_drive_report(self.root,now=self.now)
         self.client.upload.assert_called_once()
+
+    def test_id_reservation_failure_reuses_completed_archive(self):
+        self.client.generate_id.side_effect=[ConnectionError('offline'),'file-id']
+        with self.assertRaises(ConnectionError): run_drive_report(self.root,now=self.now)
+        with patch('crypto_radar.drive_report.build_archive',side_effect=AssertionError('Must reuse archive')):
+            run_drive_report(self.root,now=self.now)
+        self.client.upload.assert_called_once()
+
+    def test_confirmation_once_after_verified_upload(self):
+        with patch('crypto_radar.drive_report.send_alert') as mail:
+            run_drive_report(self.root,now=self.now,notify=True)
+            self.client.existing.return_value=self.remote
+            run_drive_report(self.root,now=self.now,notify=True)
+            mail.assert_called_once()
+            self.assertIn('file-id',mail.call_args.args[0])
+
+    def test_uncertain_confirmation_not_resent(self):
+        with patch('crypto_radar.drive_report.send_alert',side_effect=TimeoutError) as mail:
+            with self.assertRaises(TimeoutError): run_drive_report(self.root,now=self.now,notify=True)
+            self.client.existing.return_value=self.remote
+            with self.assertRaisesRegex(RuntimeError,'uncertain'):
+                run_drive_report(self.root,now=self.now,notify=True)
+            mail.assert_called_once()
 
     def test_destination_change_is_rejected(self):
         run_drive_report(self.root,now=self.now)

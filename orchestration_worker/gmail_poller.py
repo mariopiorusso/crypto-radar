@@ -261,6 +261,12 @@ def codex_command(cfg):
 def run_codex(cfg,task):
     facts = repository_facts(cfg['repository'])
     request = task['request_text'] if 'request_text' in task.keys() else ''
+    import issue_action
+    from github_delivery import normalize
+    request=issue_action.review_request(cfg,normalize(request))
+    if issue_action.requested(request):
+        issue_facts=repository_facts(cfg.get('engineering_repository') or cfg['repository'])
+        return issue_action.run(cfg,task,issue_facts)
     from snapshot_action import requested, run
     if requested(request):
         return run(cfg,task,facts)
@@ -268,6 +274,10 @@ def run_codex(cfg,task):
     if engineering and cfg.get('engineering_repository'):
         cfg=dict(cfg,repository=cfg['engineering_repository'])
         facts=repository_facts(cfg['repository'])
+    if engineering and re.search(r'^POST_COMMENT:[ \t]*YES[ \t]*$',request,re.M):
+        repo,number,_,_=issue_action.issue_fields(cfg,request)
+        with issue_action.github_session() as session:
+            facts['github_issue']=issue_action.lookup(session,repo,number)
     prompt = (ROOT/('engineering.txt' if engineering else 'bootstrap.txt')).read_text()+'\n'+json.dumps({'MODE':'ENGINEERING' if engineering else 'TEST','TASK_ID':task['task_id'],'facts':facts,'email_request':request})
     allowed = {'SYSTEMROOT','SYSTEMDRIVE','PROGRAMDATA','PROGRAMFILES','PROGRAMFILES(X86)','WINDIR','PATH','TEMP','TMP','USERPROFILE','LOCALAPPDATA','APPDATA','PATHEXT','COMSPEC'}
     env = {k:v for k,v in os.environ.items() if k.upper() in allowed}
@@ -438,16 +448,9 @@ def execute_task(cfg,state,task,runner):
             raise ValueError('Invalid report')
         if code==0:
             valid_report=True
-            if result.get('engineering') and report['outcome']=='COMPLETED' and re.search(r'^PUBLISH:[ \t]*YES[ \t]*$',task['request_text'],re.M):
-                from publishing import publish
-                try:
-                    url=publish(cfg,report['branch'],report['head'])
-                    report['github_access_status']='Published and remote SHA verified: '+url
-                    report['summary']+='\nSupervisor publication verified: '+url
-                except Exception as exc:
-                    report['outcome']='BLOCKED'
-                    report['github_access_status']='Supervisor publication failed: '+type(exc).__name__
-                    report['summary']+='\nLocal work preserved; publication failed or is uncertain. Inspect remote state before retrying.'
+            if result.get('engineering') and report['outcome']=='COMPLETED':
+                from github_delivery import deliver
+                deliver(cfg,task,report)
             if report['outcome']!='COMPLETED':
                 error='task_'+report['outcome'].lower()
     except Exception as exc:

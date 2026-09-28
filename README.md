@@ -368,3 +368,36 @@ After V1 has run reliably:
 4. Add social velocity source.
 5. Backtest thresholds and calibrate the score.
 6. Add dashboard.
+
+### Monday Drive snapshot confirmation
+
+`Crypto Radar - Weekly Files` is enabled for Mondays at **19:00 Windows local
+ time**. It uses `python -B -m crypto_radar.weekly_report --drive --notify`:
+SQLite-consistent backup, timestamped ZIP in the configured Drive folder, checksum
+verification, then a confirmation email to `EMAIL_TO` (currently
+cryptoradar128@gmail.com). The existing three-file ZIP bundle is preserved.
+Delivery state prevents duplicate uploads and confirmation sends; ambiguous email
+sends require mailbox inspection before retry. Logs: `logs/weekly-report.log`.
+To reinstall as administrator:
+`./install_weekly_report_task.ps1 -At 19:00 -Drive -Notify`.
+
+### Scheduled compact analysis upload
+
+The Monday 19:00 `Crypto Radar - Weekly Files` task now runs:
+
+```powershell
+python -B -m crypto_radar.weekly_report --drive --analysis --history-days 84 --notify
+```
+
+It creates a fresh compact analysis SQLite database and uploads a single ZIP-LZMA
+containing that database to the existing configured Drive folder. The detailed
+history window is 84 days plus required relationship/baseline context. The source
+database remains authoritative and read-only to the exporter. Full-bundle upload
+remains available manually without `--analysis`.
+
+Analysis uploads use separate `crypto-radar-analysis-<year>-W<week>.drive.json`
+state in `data/weekly-reports`, preserving old full-bundle delivery records.
+Confirmation still uses the existing email configuration and includes the Drive
+link and SHA-256. Logs remain in `logs/weekly-report.log`. ZIP-LZMA can be extracted
+with Python zipfile or 7-Zip. Install/update this schedule as administrator with:
+`./install_weekly_report_task.ps1 -At 19:00 -Drive -Notify -Analysis`.
