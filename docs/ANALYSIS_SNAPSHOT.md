@@ -144,3 +144,71 @@ silently sampling evidence to meet a connector limit.
   prespecified chronological held-out comparisons against control baselines.
 
 Run offline tests with `python -B -m unittest discover -s tests -q`.
+
+## Live-source validation, 28 September 2026
+
+The read-only validation used the live source while preserving its operation.
+The generated artifact passed quick_check, integrity_check, physical foreign-key
+checks, explicit logical relationship checks, and ZIP CRC verification. All **99
+application tests** passed (including 16 exporter tests), with no live network or
+alert calls in tests. Production data was not committed or uploaded to GitHub.
+
+- Frozen source: **1,533,186,048 bytes**.
+- Analysis database: **613,142,528 bytes**.
+- ZIP-LZMA: **70,587,782 bytes** (DB/ZIP 8.69:1; source/ZIP 21.72:1).
+- Requested detailed window: 84 days. All existing source data fell within
+  retained detail/closure, so **no source rows were omitted in this run**.
+- Market observation range: 2026-09-15T20:12:24+00:00 through
+  2026-09-28T19:43:50.560913+00:00. Future target horizons remain pending where
+  unmeasured; source/export timestamp bounds for every table are in metadata.
+- Source evidence included zero social observations and 167,000 unavailable
+  social-feature records. This is not evidence for social predictive value.
+- Validation occurred before the implementation commit; metadata correctly records
+  the base revision e23d4a73e277ebdd106ad4d96dba84eeaa98661a and a dirty working tree.
+  The validated exporter was subsequently committed as 695ee95a63612c8424531ce343ec0a0cadfeb260.
+
+| Table | Source rows | Exported rows |
+| --- | ---: | ---: |
+| market_observations | 315,300 | 315,300 |
+| assessments | 467 | 467 |
+| outcomes | 2,335 | 2,335 |
+| schema_migrations | 2 | 2 |
+| scan_runs | 3,153 | 3,153 |
+| candidate_evaluations | 315,200 | 315,200 |
+| ai_calls | 506 | 506 |
+| signal_state | 107 | 107 |
+| alert_events | 0 | 0 |
+| research_episodes | 127 | 127 |
+| social_observations | 0 | 0 |
+| social_features | 167,000 | 167,000 |
+| news_evidence | 10,798 | 10,798 |
+| collector_runs | 18,624 | 18,624 |
+| experiment_evaluations | 334,700 | 334,700 |
+| evaluation_news | 275,520 | 275,520 |
+| benchmark_members | 149,253 | 149,253 |
+| benchmark_context | 502,758 | 502,758 |
+| experiment_outcomes | 1,256,895 | 1,256,895 |
+| benchmark_outcomes | 2,349,786 | 2,349,786 |
+| v12_ai_calls | 0 | 0 |
+
+Largest allocated source storage consumers (not just logical payload):
+
+| Table/index | Bytes |
+| --- | ---: |
+| experiment_evaluations | 329,854,976 |
+| experiment_outcomes | 250,159,104 |
+| benchmark_outcomes | 195,604,480 |
+| candidate_evaluations | 122,048,512 |
+| idx_experiment_outcome_observed | 102,342,656 |
+| social_features | 85,721,088 |
+| idx_experiment_outcome_pending | 82,341,888 |
+| sqlite_autoindex_benchmark_outcomes_1 | 67,776,512 |
+| ai_calls | 46,907,392 |
+| market_observations | 38,830,080 |
+
+The growth is dominated by repeated evaluation/outcome records and their indexes;
+raw market observations occupy about 38.8 MB here. Export deduplication does not
+fix or alter production retention. No free-page waste was observed in this source.
+The 70.6 MB ZIP meets the under-100 MB target for this sample, but not the preferred
+20–50 MB range. Future 12-week datasets can be larger; preserving scientific
+evidence takes priority over a fixed attachment/connector size limit.
