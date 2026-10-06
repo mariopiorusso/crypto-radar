@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import re
 from datetime import datetime, timezone, timedelta
 
 from .collectors.social import SocialObservation, UnavailableSocialCollector, make_collector
@@ -29,6 +30,9 @@ def collect_social(conn, scan_id, markets, now, cfg, provider=None, clock=utcnow
     if not cfg['enabled'] or isinstance(provider,UnavailableSocialCollector):
         status(conn,scan_id,'social','*',now.isoformat(),'unavailable')
         return 'unavailable', 0
+    from .collectors.social_providers import ProviderCollection
+    if isinstance(provider,ProviderCollection):
+        return collect_providers(conn,scan_id,markets,now,provider,clock)
     errors = 0
     count = 0
     try:
@@ -66,6 +70,48 @@ def collect_social(conn, scan_id, markets, now, cfg, provider=None, clock=utcnow
     status(conn,scan_id,'social','*',now.isoformat(),state,count,'invalid_or_failed' if errors else None)
     conn.commit()
     return state, errors
+
+
+def collect_providers(conn,scan_id,markets,now,collection,clock):
+    history={}
+    for name in collection.collectors:
+        row=conn.execute("SELECT observed_ts,status,error FROM collector_runs WHERE collector=? AND status NOT IN ('cooldown','disabled') ORDER BY observed_ts DESC LIMIT 1",
+                         ('social:'+name,)).fetchone()
+        if row: history[name]=tuple(row)
+    states=[]; errors=0; total=0
+    for batch in collection.batches(markets,now,clock,history):
+        count=0; failures=0
+        for item in batch.observations:
+            try:
+                # Safe numeric native metrics, separate from normalized research.
+                if len(item.native)>64 or any(type(v) not in (int,float,type(None)) for v in item.native.values()):
+                    raise ValueError('Native evidence must contain bounded numeric metrics')
+                if any(re.search(r'(?i)token|password|secret|credential|authorization|api_key',k) for k in item.native):
+                    raise ValueError('Secret-like native field prohibited')
+                metadata={k:item.metadata[k] for k in ('community','sources','timestamp_convention','normalization_version','resolution',
+                          'duplicate_method','concentration_method') if k in item.metadata}
+                meta=json.dumps(metadata,allow_nan=False); native=json.dumps(item.native,allow_nan=False)
+                if len(meta)+len(native)>16384: raise ValueError('Provider evidence too large')
+                count+=conn.execute('''INSERT OR IGNORE INTO provider_social_observations
+                    (provider,provider_asset_id,coin_id,symbol,source,window_start,window_end,observed_ts,
+                     provider_ts,receipt_ts,availability,mentions,unique_authors,engagement,sentiment,
+                     positive,negative,neutral,duplicate_fraction,top_author_fraction,metadata_json,native_json)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                    (item.provider,item.provider_asset_id,item.coin_id,item.symbol,item.source,
+                     item.window_start.isoformat(),item.window_end.isoformat(),item.receipt_timestamp.isoformat(),
+                     item.provider_timestamp.isoformat() if item.provider_timestamp else None,item.receipt_timestamp.isoformat(),
+                     item.availability,item.mentions,item.unique_authors,item.engagement,item.sentiment,
+                     item.positive,item.negative,item.neutral,item.duplicate_fraction,item.top_author_fraction,meta,native)).rowcount
+            except (ValueError,TypeError): failures+=1
+        state='partial_error' if failures else batch.status
+        status(conn,scan_id,'social:'+batch.provider,'*',clock().isoformat(),state,count,batch.error or ('invalid_observation' if failures else None))
+        states.append(state); total+=count
+        errors+=failures+int(batch.status in ('failed','malformed','unauthorized','rate_limited'))
+    state=('partial_error' if errors and total else 'failed' if errors else
+           'available' if total else 'unavailable')
+    status(conn,scan_id,'social','*',clock().isoformat(),state,total)
+    conn.commit()
+    return state,errors
 
 
 def ingest_news(conn, coin, items, observed, cfg):
@@ -144,6 +190,11 @@ def run_detector(conn,scan_id,markets,stats_by_coin,market_ts,cfg,summary,fetch_
         market = stats_by_coin.get(coin['id'])
         rows = conn.execute('SELECT * FROM social_observations WHERE coin_id=? AND window_end>=?',
             (coin['id'],(cutoff-timedelta(hours=settings['social']['baseline_hours']+1)).isoformat())).fetchall()
+        active={name for name in settings['social']['providers'] if settings['social']['provider_options'].get(name,{}).get('enabled',False)}
+        if hasattr(provider,'settings'):
+            active={name for name,options in provider.settings.items() if options.enabled}
+        rows += [r for r in conn.execute('SELECT * FROM provider_social_observations WHERE coin_id=? AND window_end>=?',
+            (coin['id'],(cutoff-timedelta(hours=settings['social']['baseline_hours']+1)).isoformat())).fetchall() if r['provider'] in active]
         social = social_features(rows,cutoff,settings['social'])
         keys = ('status','mentions_5m','mentions_15m','mentions_1h','baseline_windows','mention_acceleration',
                 'author_acceleration','engagement_acceleration','sentiment_change','source_count',

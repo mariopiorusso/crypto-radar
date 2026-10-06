@@ -4,17 +4,27 @@ Counts are interval counts, never rolling cumulative totals. Missing metrics sta
 None; zero means measured zero. Providers must map assets to CoinGecko IDs.
 """
 from datetime import datetime, timezone
-from typing import Protocol
+from typing import Protocol, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class SocialObservation(BaseModel):
-    model_config = ConfigDict(strict=True, extra='forbid', allow_inf_nan=False)
+    model_config = ConfigDict(strict=True, extra='forbid', allow_inf_nan=False, revalidate_instances='always')
     coin_id: str = Field(min_length=1, max_length=200)
+    provider: str = Field(default='legacy', pattern=r'^[a-z][a-z0-9_]{0,49}$')
+    provider_asset_id: str | None = Field(default=None,min_length=1,max_length=200)
+    symbol: str | None = Field(default=None,max_length=100)
+    provider_timestamp: datetime | None = None
+    receipt_timestamp: datetime | None = None
+    availability: Literal['available','unavailable','stale'] = 'available'
+    positive: int | None = Field(default=None, ge=0)
+    negative: int | None = Field(default=None, ge=0)
+    neutral: int | None = Field(default=None, ge=0)
+    native: dict = Field(default_factory=dict)
     source: str = Field(min_length=1, max_length=100)
     window_start: datetime
     window_end: datetime
-    mentions: int = Field(ge=0)
+    mentions: int | None = Field(default=None, ge=0)
     unique_authors: int | None = Field(default=None, ge=0)
     engagement: float | None = Field(default=None, ge=0)
     sentiment: float | None = Field(default=None, ge=-1, le=1)
@@ -32,7 +42,13 @@ class SocialObservation(BaseModel):
         if ((self.window_end-self.window_start).total_seconds() != 300
                 or self.window_start.timestamp() % 300 != 0):
             raise ValueError('Aligned five-minute buckets required')
-        if self.unique_authors is not None and self.unique_authors > self.mentions:
+        for name in ('provider_timestamp','receipt_timestamp'):
+            value = getattr(self,name)
+            if value is not None:
+                if value.tzinfo is None or value.utcoffset() is None:
+                    raise ValueError('UTC-aware timestamps required')
+                setattr(self,name,value.astimezone(timezone.utc))
+        if self.unique_authors is not None and self.mentions is not None and self.unique_authors > self.mentions:
             raise ValueError('Unique authors cannot exceed mentions')
         return self
 
@@ -57,4 +73,5 @@ class FixtureSocialCollector:
 
 
 def make_collector(cfg):
-    return UnavailableSocialCollector()
+    from .social_providers import ProviderCollection
+    return ProviderCollection.from_config(cfg)

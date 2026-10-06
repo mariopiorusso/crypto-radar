@@ -116,6 +116,19 @@ def _report(db):
         sum(CASE WHEN mentions=0 THEN 1 ELSE 0 END) AS observed_zero_rows,
         min(observed_ts) AS start,max(observed_ts) AS end FROM social_observations''').fetchone())
     social['observed_zero_rows'] = social['observed_zero_rows'] or 0
+    social['providers']=[]
+    if db.execute("SELECT 1 FROM sqlite_master WHERE name='provider_social_observations'").fetchone():
+        social['providers']=[dict(r) for r in db.execute('''SELECT provider,availability,count(*) observation_rows,
+            sum(CASE WHEN mentions=0 THEN 1 ELSE 0 END) observed_zero_rows,
+            sum(CASE WHEN mentions IS NULL THEN 1 ELSE 0 END) unavailable_mentions,
+            min(observed_ts) start,max(observed_ts) end
+            FROM provider_social_observations GROUP BY provider,availability ORDER BY provider,availability''')]
+        social['observation_rows']+=sum(r['observation_rows'] for r in social['providers'])
+        social['observed_zero_rows']+=sum(r['observed_zero_rows'] for r in social['providers'])
+        starts=[r['start'] for r in social['providers'] if r['start']]+([social['start']] if social['start'] else [])
+        ends=[r['end'] for r in social['providers'] if r['end']]+([social['end']] if social['end'] else [])
+        social['start']=min(starts) if starts else None
+        social['end']=max(ends) if ends else None
     social['feature_statuses'] = [dict(r) for r in db.execute('''SELECT status,count(*) AS rows,
         sum(CASE WHEN mentions_5m IS NULL THEN 1 ELSE 0 END) AS missing_5m,
         sum(CASE WHEN mentions_5m=0 THEN 1 ELSE 0 END) AS recorded_zero_5m

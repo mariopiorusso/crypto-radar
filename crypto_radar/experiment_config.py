@@ -5,7 +5,7 @@ import math
 DEFAULTS = {
     "enabled": False,
     "max_market_age_seconds": 600,
-    "social": {"enabled": False, "provider": "none", "baseline_hours": 24,
+    "social": {"enabled": False, "provider": "none", "providers": [], "provider_options": {}, "baseline_hours": 24,
                "min_baseline_windows": 12, "min_coverage": 0.8,
                "max_duplicate_fraction": 0.5, "max_top_author_fraction": 0.5},
     "news": {"enabled": True, "assets_per_scan": 10, "poll_minutes": 30,
@@ -29,6 +29,14 @@ def normalize(raw):
         result = copy.deepcopy(default)
         for key, value in supplied.items():
             template = default[key]
+            if path == 'v12.social' and key == 'provider_options':
+                from .collectors.social_providers import settings_for, registry
+                if not isinstance(value,dict) or set(value)-set(registry()):
+                    raise ValueError('Unknown social provider options')
+                if any(not isinstance(settings,dict) for settings in value.values()):
+                    raise ValueError('Provider settings must be objects')
+                result[key]={name:settings_for(registry()[name],settings).model_dump() for name,settings in value.items()}
+                continue
             if isinstance(template, dict):
                 result[key] = merge(template, value, path + '.' + key)
                 continue
@@ -45,7 +53,13 @@ def normalize(raw):
         return result
     cfg = merge(DEFAULTS, raw, 'v12')
     if cfg['social']['provider'] != 'none':
-        raise ValueError('No production social adapter installed; use provider: none')
+        raise ValueError('Use social.providers; legacy provider must remain none')
+    from .collectors.social_providers import registry
+    providers=cfg['social']['providers']
+    if len(providers)!=len(set(providers)) or set(providers)-set(registry()):
+        raise ValueError('Duplicate or unimplemented social providers')
+    if set(cfg['social']['provider_options'])-set(providers):
+        raise ValueError('Provider options require a listed provider')
     for key in ('min_coverage', 'max_duplicate_fraction', 'max_top_author_fraction'):
         if not 0 < cfg['social'][key] <= 1:
             raise ValueError('Social fractions must be in (0,1]')

@@ -1,4 +1,4 @@
-"""Read-only, schema-v2 research export. Original names are lossless SQL views."""
+"""Read-only schema-v2/v3 research export. Original names are lossless SQL views."""
 import argparse
 from collections import OrderedDict
 from contextlib import closing
@@ -25,7 +25,13 @@ TIMES = {
     'evaluation_news': None, 'benchmark_members': 'observed_ts',
     'benchmark_context': 'observed_ts', 'experiment_outcomes': 'target_ts',
     'benchmark_outcomes': 'observed_ts', 'v12_ai_calls': 'reserved_ts',
+    'provider_social_observations': 'observed_ts',
 }
+
+
+def source_times(conn):
+    tables={r[0] for r in conn.execute("SELECT name FROM src.sqlite_master WHERE type='table'")}
+    return {table:stamp for table,stamp in TIMES.items() if table in tables}
 
 
 def q(name):
@@ -128,18 +134,18 @@ def relations(conn, tables):
 
 def select_rows(conn, cutoff):
     """Ownership closure keeps complete connected research evidence, not sampled arms."""
-    for table, stamp in TIMES.items():
+    for table, stamp in source_times(conn).items():
         conn.execute(f'CREATE TEMP TABLE {q("keep_"+table)} (rid INTEGER PRIMARY KEY)')
         where = '1' if table in ('schema_migrations', 'signal_state') else (
             f'julianday({q(stamp)}) >= julianday(?)' if stamp else '0')
         conn.execute(f'INSERT INTO {q("keep_"+table)} SELECT rowid FROM src.{q(table)} WHERE {where}',
                      (cutoff,) if '?' in where else ())
-    edges = relations(conn, TIMES)
+    edges = relations(conn, source_times(conn))
     complete = all(conn.execute(f'SELECT count(*) FROM {q("keep_"+t)}').fetchone()[0] ==
                    conn.execute(f'SELECT count(*) FROM src.{q(t)} WHERE {q(stamp)} IS NOT NULL').fetchone()[0]
-                   for t, stamp in TIMES.items() if stamp and t not in ('schema_migrations','signal_state'))
+                   for t, stamp in source_times(conn).items() if stamp and t not in ('schema_migrations','signal_state'))
     if complete:
-        for t in TIMES:
+        for t in source_times(conn):
             conn.execute(f'INSERT OR IGNORE INTO {q("keep_"+t)} SELECT rowid FROM src.{q(t)}')
     # Child evidence follows retained parents; foreign-key parents always follow children.
     # Shared news/features do not pull unrelated historical evaluations into the cohort.
@@ -171,7 +177,8 @@ def select_rows(conn, cutoff):
             anchors.append(value)
     earliest = min(datetime.fromisoformat(v).astimezone(timezone.utc) for v in anchors)
     baseline = (earliest - timedelta(days=7)).isoformat()
-    for table, column in [('market_observations', 'ts'), ('social_observations', 'observed_ts')]:
+    for table, column in [('market_observations', 'ts'), ('social_observations', 'observed_ts'), ('provider_social_observations','observed_ts')]:
+        if table not in source_times(conn): continue
         conn.execute(f'INSERT OR IGNORE INTO {q("keep_"+table)} SELECT rowid FROM src.{q(table)} '
                      f'WHERE julianday({q(column)})>=julianday(?)', (baseline,))
     return edges, baseline
@@ -293,7 +300,7 @@ def factor_measurements(conn, table):
 def summaries(conn):
     conn.execute('CREATE TABLE snapshot_history (source_table TEXT, day TEXT, dimensions_json TEXT, rows INTEGER)')
     # Omitted data: descriptive longitudinal denominators, never pretend to retain paths.
-    for table, stamp in TIMES.items():
+    for table, stamp in source_times(conn).items():
         if not stamp:
             continue
         cols = {r[1] for r in conn.execute(f'PRAGMA src.table_info({q(table)})')}
@@ -331,6 +338,11 @@ def summaries(conn):
         'analysis_ai': "SELECT '1.1' detector,status,count(*) calls FROM ai_calls GROUP BY 2 UNION ALL SELECT '1.2',status,count(*) FROM v12_ai_calls GROUP BY 2",
         'analysis_scans': 'SELECT status,count(*) scans,min(started_ts) first_ts,max(started_ts) last_ts FROM scan_runs GROUP BY 1',
     }
+    if 'provider_social_observations' in source_times(conn):
+        views['analysis_social_providers']='''SELECT provider,coin_id,availability,count(*) windows,
+            count(mentions) measured_mentions,count(unique_authors) author_windows,
+            min(window_start) first_window,max(window_end) last_window
+            FROM provider_social_observations GROUP BY provider,coin_id,availability'''
     for name, sql in views.items():
         conn.execute(f'CREATE VIEW {q(name)} AS {sql}')
 
@@ -381,19 +393,20 @@ def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=No
                 conn.execute('ATTACH DATABASE ? AS src', (backup.as_uri()+'?mode=ro',))
                 tables = {r[0] for r in conn.execute("SELECT name FROM src.sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
                 version = conn.execute('PRAGMA src.user_version').fetchone()[0]
-                if tables != set(TIMES) or version != 2:
-                    raise ValueError('Unsupported source schema; retention policy requires schema v2 tables')
+                expected=set(TIMES) - ({'provider_social_observations'} if version==2 else set())
+                if tables != expected or version not in (2,3):
+                    raise ValueError('Unsupported source schema; retention policy requires schema v2/v3 tables')
                 source_schema = list(conn.execute("SELECT name,sql FROM src.sqlite_master WHERE sql IS NOT NULL ORDER BY name"))
                 conn.execute('CREATE TABLE snapshot_source_schema (name TEXT PRIMARY KEY, sql TEXT)')
                 conn.executemany('INSERT INTO snapshot_source_schema VALUES (?,?)', source_schema)
                 cutoff = (now-timedelta(days=history_days)).isoformat()
                 edges, baseline = select_rows(conn, cutoff)
                 encoder = TextEncoder(conn)
-                for table in TIMES:
+                for table in source_times(conn):
                     copy_table(conn, table, encoder)
                 for table in ('benchmark_outcomes', 'benchmark_context', 'experiment_outcomes'):
                     factor_measurements(conn, table)
-                stats = {table: diagnostics(conn, table) for table in TIMES}
+                stats = {table: diagnostics(conn, table) for table in source_times(conn)}
                 summaries(conn)
                 for _, sql in conn.execute("SELECT name,sql FROM src.sqlite_master WHERE type='view'").fetchall():
                     conn.execute(sql)

@@ -69,7 +69,7 @@ class AnalysisSnapshotTests(unittest.TestCase):
         before=hashlib.sha256(self.source.read_bytes()).digest()
         self.export()
         self.assertEqual(hashlib.sha256(self.source.read_bytes()).digest(),before)
-        self.assertEqual(self.db.execute('PRAGMA user_version').fetchone()[0],2)
+        self.assertEqual(self.db.execute('PRAGMA user_version').fetchone()[0],3)
 
     def test_storage_diagnostics_cover_allocated_pages_and_overflow(self):
         self.db.execute('UPDATE experiment_evaluations SET features_json=?',('x'*20000,))
