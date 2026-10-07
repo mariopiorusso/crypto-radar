@@ -4,7 +4,7 @@ from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
-VERSION = 3
+VERSION = 4
 STATEMENTS = [
     "CREATE TABLE schema_migrations (version INTEGER PRIMARY KEY, applied_ts TEXT NOT NULL)",
     "ALTER TABLE market_observations ADD COLUMN source_updated_ts TEXT",
@@ -44,7 +44,8 @@ def migrate(conn, path):
     try:
         from .experiment_schema import STATEMENTS as V12_STATEMENTS
         from .social_schema import STATEMENTS as SOCIAL_STATEMENTS
-        for target, statements in ((1, STATEMENTS), (2, V12_STATEMENTS), (3, SOCIAL_STATEMENTS)):
+        from .cryptosocial_schema import STATEMENTS as SOURCE_STATEMENTS
+        for target, statements in ((1, STATEMENTS), (2, V12_STATEMENTS), (3, SOCIAL_STATEMENTS), (4, SOURCE_STATEMENTS)):
             if version < target:
                 for statement in statements:
                     conn.execute(statement)

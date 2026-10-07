@@ -1,4 +1,4 @@
-"""Read-only schema-v2/v3 research export. Original names are lossless SQL views."""
+"""Read-only schema-v2/v3/v4 research export. Original names are lossless SQL views."""
 import argparse
 from collections import OrderedDict
 from contextlib import closing
@@ -394,8 +394,9 @@ def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=No
                 tables = {r[0] for r in conn.execute("SELECT name FROM src.sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
                 version = conn.execute('PRAGMA src.user_version').fetchone()[0]
                 expected=set(TIMES) - ({'provider_social_observations'} if version==2 else set())
-                if tables != expected or version not in (2,3):
-                    raise ValueError('Unsupported source schema; retention policy requires schema v2/v3 tables')
+                if version==4: expected.add('social_source_items')
+                if tables != expected or version not in (2,3,4):
+                    raise ValueError('Unsupported source schema; retention policy requires schema v2/v3/v4 tables')
                 source_schema = list(conn.execute("SELECT name,sql FROM src.sqlite_master WHERE sql IS NOT NULL ORDER BY name"))
                 conn.execute('CREATE TABLE snapshot_source_schema (name TEXT PRIMARY KEY, sql TEXT)')
                 conn.executemany('INSERT INTO snapshot_source_schema VALUES (?,?)', source_schema)
@@ -422,6 +423,7 @@ def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=No
                     source_free_pages=conn.execute('PRAGMA src.freelist_count').fetchone()[0],
                     requested_history_days=history_days, requested_cutoff_utc=cutoff, baseline_start_utc=baseline,
                     git=revision(), tables=stats,
+                    excluded_tables={'social_source_items':'Minimal item provenance remains in source DB; normalized buckets, versions and receipt chronology exported.'} if version==4 else {},
                     policy='Recent rows plus complete ownership/FK closure; all market/social paths from oldest retained anchor minus 7 days. Older omitted rows summarized by day and strata. TEXT values losslessly interned; original names are SQL views. No row sampling or rounding.',
                     limitations='Older aggregate-only data cannot reconstruct individual paths or causal chronology. Existing sampling gaps and missing social data remain. Export is analysis-only, not a scanner database. Long episodes can extend detail beyond the requested window. Seven-day raw baseline may not reproduce custom longer baselines; saved features/configs retained. Source snapshot is current, not a historical as-of reconstruction.',
                     integrity_check='ok', quick_check='ok', foreign_key_check='ok', relationship_check='ok')

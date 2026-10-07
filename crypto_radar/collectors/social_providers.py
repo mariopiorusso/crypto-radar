@@ -48,7 +48,8 @@ class ProviderBatch:
 
 def registry():
     from .stockgeist import StockGeistCollector
-    return {'stockgeist': StockGeistCollector}
+    from .cryptosocial import CryptoSocialCollector
+    return {'stockgeist': StockGeistCollector, 'cryptosocial': CryptoSocialCollector}
 
 
 def settings_for(factory, values):
@@ -62,6 +63,10 @@ class ProviderCollection:
     def __init__(self, collectors, settings):
         self.collectors=collectors
         self.settings=settings
+
+    def scoring_providers(self):
+        return {name for name, options in self.settings.items()
+                if options.enabled and not getattr(options,'observation_only',False)}
 
     @classmethod
     def from_config(cls,cfg):
@@ -80,7 +85,7 @@ class ProviderCollection:
             if previous:
                 timestamp,previous_status,error=previous
                 delay=settings.poll_seconds
-                if previous_status in ('rate_limited','failed','malformed','unauthorized'):
+                if previous_status in ('rate_limited','failed','malformed','unauthorized','partial_error','approval_required'):
                     delay=settings.retry_seconds
                     if error and error.startswith('retry_after:'):
                         delay=max(delay,min(86400,int(error.split(':')[1])))
@@ -98,6 +103,9 @@ class ProviderCollection:
                         raise ValueError('Provider identity or asset mapping mismatch')
                     if item.window_end>now or (item.provider_timestamp and item.provider_timestamp>receipt):
                         raise ValueError('Future provider evidence')
+                    if any(e.event_timestamp > receipt or not item.window_start <= e.event_timestamp < item.window_end
+                           or item.coin_id not in e.assets for e in item.evidence):
+                        raise ValueError('Invalid source evidence chronology or mapping')
                     # Receipt is measured locally, never accepted from a provider.
                     item.receipt_timestamp=receipt
                     if (receipt-item.window_end).total_seconds()>settings.max_age_seconds:
