@@ -8,6 +8,25 @@ from typing import Protocol, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
+class SourceEvidence(BaseModel):
+    """Minimum item provenance; no text, author, URLs, or source payload."""
+    model_config = ConfigDict(strict=True, extra='forbid', allow_inf_nan=False)
+    item_id: str = Field(pattern=r'^[A-Za-z0-9_:-]{1,100}$')
+    event_timestamp: datetime
+    community: str = Field(pattern=r'^[A-Za-z0-9_]{1,50}$')
+    assets: list[str] = Field(max_length=50)
+    engagement: float | None = Field(default=None, ge=0)
+
+    @model_validator(mode='after')
+    def timestamp(self):
+        if self.event_timestamp.tzinfo is None or self.event_timestamp.utcoffset() is None:
+            raise ValueError('Aware event timestamp required')
+        self.event_timestamp = self.event_timestamp.astimezone(timezone.utc)
+        if any(not 1 <= len(a) <= 200 for a in self.assets):
+            raise ValueError('Bounded canonical asset IDs required')
+        return self
+
+
 class SocialObservation(BaseModel):
     model_config = ConfigDict(strict=True, extra='forbid', allow_inf_nan=False, revalidate_instances='always')
     coin_id: str = Field(min_length=1, max_length=200)
@@ -32,6 +51,7 @@ class SocialObservation(BaseModel):
     top_author_fraction: float | None = Field(default=None, ge=0, le=1)
     # Only provider-specific non-secret evidence belongs here.
     metadata: dict = Field(default_factory=dict)
+    evidence: list[SourceEvidence] = Field(default_factory=list, max_length=1000)
 
     @model_validator(mode='after')
     def bucket(self):

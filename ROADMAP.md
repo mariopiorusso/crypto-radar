@@ -67,9 +67,14 @@ frozen equal-weight basket of other tracked non-stablecoins, not the entire mark
 Missing endpoints remain missing. Benchmark measurements support regime analysis;
 they do not establish a validated regime-adjusted predictive model.
 
-**There is no production social provider in this repository.**
-[The collector factory](crypto_radar/collectors/social.py) always returns an
-unavailable collector; deterministic fixtures are injection-only test inputs.
+**IMPLEMENTED adapters are not VALIDATED social research.**
+The [provider registry](crypto_radar/collectors/social_providers.py) retains the
+StockGeist API adapter, disabled pending credentials/access validation, and adds
+the first-party [CryptoSocial offline evidence foundation](docs/CRYPTOSOCIAL.md).
+Reddit networking is BLOCKED pending suitable approved research access and a
+retention/deletion design; its source returns `approval_required`. Synthetic
+complete-bucket sources are injection-only tests, not a live feed. No provider
+is enabled by default; CryptoSocial is observation-only and excluded from scoring.
 Real production social observations are unavailable in this engineering checkout
 and cannot be inferred from tests or empty collector results. Missing is not zero.
 Social-vs-market ordering and the social hypothesis remain unvalidated.

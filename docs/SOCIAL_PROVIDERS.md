@@ -1,6 +1,8 @@
 # Provider-independent social collection
 
-StockGeist is the only production adapter implemented. LunarCrush and Santiment
+StockGeist remains the external API adapter. CryptoSocial is an additive first-party
+offline evidence adapter with a blocked Reddit source; see [CryptoSocial](CRYPTOSOCIAL.md)
+for the access review, canary and limitations. LunarCrush and Santiment
 are future adapters. No provider is enabled by default, and this change does not
 enable production collection, experimental AI, alerts, or trading.
 

@@ -20,14 +20,21 @@ def social_features(rows, now, cfg):
         if provider=='legacy':
             features[provider]=_provider_features(items,now,cfg); continue
         eligible=[r for r in items if datetime.fromisoformat(r['observed_ts'])<=now
+                  and (not r.get('receipt_ts') or datetime.fromisoformat(r['receipt_ts'])<=now)
                   and datetime.fromisoformat(r['window_end'])<=now and r.get('availability')!='unavailable']
         latest=max((datetime.fromisoformat(r['window_end']) for r in eligible),default=None)
         # Provider asset mapping and source coverage are part of the series identity.
         def series(row):
             metadata=json.loads(row['metadata_json']) if 'metadata_json' in row else row.get('metadata',{})
             return json.dumps([row.get('provider_asset_id'),row['source'],metadata.get('normalization_version'),
-                               metadata.get('timestamp_convention')])
-        eligible=[dict(r,source=series(r)) for r in eligible]
+                               metadata.get('timestamp_convention'),metadata.get('engagement_definition'),
+                               metadata.get('mapping_version')])
+        # A mapping/coverage/metric-definition change starts a new cohort, not
+        # a second channel whose counts can be summed with its predecessor.
+        latest_series={}
+        for r in sorted(eligible,key=lambda r:(r['window_end'],r['observed_ts'],series(r))):
+            latest_series[r['source']]=series(r)
+        eligible=[dict(r,source=series(r)) for r in eligible if series(r)==latest_series[r['source']]]
         features[provider]=_provider_features(eligible,now,cfg,end=latest)
         features[provider]['baseline_version']='provider_relative_v1'
         max_age=cfg.get('provider_options',{}).get(provider,{}).get('max_age_seconds',900)

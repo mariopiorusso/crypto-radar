@@ -129,6 +129,13 @@ def _report(db):
         ends=[r['end'] for r in social['providers'] if r['end']]+([social['end']] if social['end'] else [])
         social['start']=min(starts) if starts else None
         social['end']=max(ends) if ends else None
+        social['sources']=[dict(r) for r in db.execute('''SELECT provider,source,availability,
+            count(*) observation_rows,sum(mentions IS NULL) missing_mentions,sum(mentions=0) zero_mentions,
+            sum(unique_authors IS NULL) missing_authors,sum(engagement IS NULL) missing_engagement,
+            min(window_start) first_event_window,min(receipt_ts) first_receipt,max(receipt_ts) last_receipt,
+            min(CASE WHEN mentions>0 THEN receipt_ts END) first_attention_receipt
+            FROM provider_social_observations GROUP BY provider,source,availability ORDER BY provider,source,availability''')]
+        social['chronology_note']='First attention receipt is availability of measured mentions, not an anomaly or a predictive signal.'
     social['feature_statuses'] = [dict(r) for r in db.execute('''SELECT status,count(*) AS rows,
         sum(CASE WHEN mentions_5m IS NULL THEN 1 ELSE 0 END) AS missing_5m,
         sum(CASE WHEN mentions_5m=0 THEN 1 ELSE 0 END) AS recorded_zero_5m
