@@ -1,0 +1,713 @@
+{
+  "status": "descriptive",
+  "cohorts": [
+    {
+      "cohort": "apewisdom_only",
+      "episodes": 0,
+      "evaluations": 0,
+      "news_observed_evaluations": 0,
+      "feature_observations": [],
+      "horizons": [
+        {
+          "hours": 1,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 3,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 6,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 12,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 24,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "cohort": "x_only",
+      "episodes": 0,
+      "evaluations": 0,
+      "news_observed_evaluations": 0,
+      "feature_observations": [],
+      "horizons": [
+        {
+          "hours": 1,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 3,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 6,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 12,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 24,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "cohort": "both",
+      "episodes": 2,
+      "evaluations": 3,
+      "news_observed_evaluations": 0,
+      "feature_observations": [
+        {
+          "evaluation_id": 1,
+          "apewisdom_observed": true,
+          "x_observed": true,
+          "rolling_mentions_delta": 3,
+          "rolling_rank_delta": 0,
+          "rolling_upvotes_delta": 0,
+          "x_observed_posts": 1,
+          "x_observed_posts_per_minute": 0.06666666666666667,
+          "x_engagement_delta": null,
+          "x_delayed_posts": 0,
+          "x_gap_seconds": 0.0,
+          "x_search_status": "available"
+        },
+        {
+          "evaluation_id": 2,
+          "apewisdom_observed": true,
+          "x_observed": true,
+          "rolling_mentions_delta": 3,
+          "rolling_rank_delta": 0,
+          "rolling_upvotes_delta": 0,
+          "x_observed_posts": 1,
+          "x_observed_posts_per_minute": 0.06666666666666667,
+          "x_engagement_delta": null,
+          "x_delayed_posts": 0,
+          "x_gap_seconds": 0.0,
+          "x_search_status": "available"
+        },
+        {
+          "evaluation_id": 3,
+          "apewisdom_observed": true,
+          "x_observed": true,
+          "rolling_mentions_delta": 3,
+          "rolling_rank_delta": 0,
+          "rolling_upvotes_delta": 0,
+          "x_observed_posts": 1,
+          "x_observed_posts_per_minute": 0.06666666666666667,
+          "x_engagement_delta": null,
+          "x_delayed_posts": 0,
+          "x_gap_seconds": 0.0,
+          "x_search_status": "available"
+        }
+      ],
+      "horizons": [
+        {
+          "hours": 1,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 7.0,
+              "median": 7.0
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 6.0,
+              "median": 6.0
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 2,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 5.0,
+              "median": 5.0
+            }
+          }
+        },
+        {
+          "hours": 3,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 7.0,
+              "median": 7.0
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 6.0,
+              "median": 6.0
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 2,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 5.0,
+              "median": 5.0
+            }
+          }
+        },
+        {
+          "hours": 6,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 7.0,
+              "median": 7.0
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 6.0,
+              "median": 6.0
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 2,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 5.0,
+              "median": 5.0
+            }
+          }
+        },
+        {
+          "hours": 12,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 7.0,
+              "median": 7.0
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 6.0,
+              "median": 6.0
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 2,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 5.0,
+              "median": 5.0
+            }
+          }
+        },
+        {
+          "hours": 24,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 7.0,
+              "median": 7.0
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 6.0,
+              "median": 6.0
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 2,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 2,
+              "missing_episodes": 0,
+              "mean": 5.0,
+              "median": 5.0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "cohort": "neither",
+      "episodes": 0,
+      "evaluations": 0,
+      "news_observed_evaluations": 0,
+      "feature_observations": [],
+      "horizons": [
+        {
+          "hours": 1,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 3,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 6,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 12,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        },
+        {
+          "hours": 24,
+          "metrics": {
+            "return_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_btc_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_eth_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            },
+            "excess_broad_pct": {
+              "measured_episodes": 0,
+              "missing_episodes": 0,
+              "mean": null,
+              "median": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "attention_to_volume_anomaly": [
+    {
+      "episode_id": 1,
+      "attention_first_available_ts": "2026-10-20T12:00:00+00:00",
+      "market_anomaly_ts": "2026-10-20T12:10:00+00:00",
+      "lead_minutes": 10.0
+    },
+    {
+      "episode_id": 2,
+      "attention_first_available_ts": "2026-10-20T12:00:00+00:00",
+      "market_anomaly_ts": "2026-10-20T12:10:00+00:00",
+      "lead_minutes": 10.0
+    }
+  ],
+  "usage": [
+    {
+      "provider": "x",
+      "billing_period": "2026-10",
+      "currency": "USD",
+      "requests": 1,
+      "resources_or_reserved": 1,
+      "estimated_or_reserved_usd": 0.02,
+      "uncertain_requests": 0
+    }
+  ],
+  "collection": [
+    {
+      "provider": "apewisdom",
+      "status": "available",
+      "runs": 2
+    },
+    {
+      "provider": "x",
+      "status": "available",
+      "runs": 1
+    }
+  ],
+  "missing_rates": {
+    "apewisdom": 0.0,
+    "x": 0.0
+  },
+  "methodology": {
+    "as_of": "Evidence received by min(detection,evidence cutoff); historical comparison fields never backdated.",
+    "rolling": "ApeWisdom changes are rolling-window deltas, never interval mention counts; repeated responses are freshness-unknown.",
+    "x": "Velocity is observed search-result density, never an estimate of total X activity; delayed posts are identified.",
+    "weighting": "Average evaluations per episode/cohort/horizon then weight episodes equally. Episodes may appear in multiple cohorts; cohorts are not independent experiments.",
+    "outcomes": "Only within-tolerance measurements. Missing benchmarks stay null. No predictive significance claim.",
+    "retention": "Scanner evaluations freeze numeric as-of features for later outcomes. Alternate freshness windows and older evaluations require retained raw evidence; removed raw evidence is unavailable."
+  }
+}

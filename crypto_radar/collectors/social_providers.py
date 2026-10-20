@@ -44,11 +44,13 @@ class ProviderBatch:
     status: str
     observations: list = field(default_factory=list)
     error: str | None = None
+    persisted_count: int = 0
 
 
 def registry():
     from .stockgeist import StockGeistCollector
-    return {'stockgeist': StockGeistCollector}
+    from .attention import ApeWisdomCollector, XCollector
+    return {'stockgeist': StockGeistCollector, 'apewisdom': ApeWisdomCollector, 'x': XCollector}
 
 
 def settings_for(factory, values):
@@ -70,7 +72,7 @@ class ProviderCollection:
                   for name in cfg.get('providers',[])}
         return cls({name:factories[name](setting) for name,setting in settings.items()},settings)
 
-    def batches(self,assets,now,clock,history=None):
+    def batches(self,assets,now,clock,history=None,conn=None):
         history=history or {}
         for name,collector in self.collectors.items():
             settings=self.settings[name]
@@ -87,6 +89,10 @@ class ProviderCollection:
                 if now < datetime.fromisoformat(timestamp)+timedelta(seconds=delay):
                     yield ProviderBatch(name,'cooldown'); continue
             try:
+                if getattr(collector,'native_evidence',False) is True:
+                    state,count=collector.collect_persist(conn,assets,now,clock)
+                    yield ProviderBatch(name,state,persisted_count=count)
+                    continue
                 rows=collector.collect(assets,now)
                 if not isinstance(rows,list) or len(rows)>100000:
                     raise ValueError('Bounded observation list required')

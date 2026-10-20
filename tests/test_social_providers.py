@@ -168,7 +168,9 @@ class ProviderResearchTests(ExperimentCase):
             (coin_id,source,window_start,window_end,observed_ts,mentions,metadata_json)
             VALUES (?,?,?,?,?,0,'{}')''',('example','legacy', (NOW-timedelta(minutes=5)).isoformat(),NOW.isoformat(),NOW.isoformat()))
         self.conn.execute('DROP TABLE provider_social_observations')
-        self.conn.execute('DELETE FROM schema_migrations WHERE version=3')
+        for table in ('x_post_metrics','x_post_assets','x_posts','apewisdom_snapshots','attention_runs','provider_usage'):
+            self.conn.execute('DROP TABLE '+table)
+        self.conn.execute('DELETE FROM schema_migrations WHERE version>=3')
         self.conn.execute('PRAGMA user_version=2'); self.conn.commit()
         export_snapshot(self.path,self.path+'.v2.db',as_of=NOW)
         from crypto_radar import social_schema
@@ -179,7 +181,7 @@ class ProviderResearchTests(ExperimentCase):
         backup=migrate(self.conn,self.path)
         with closing(sqlite3.connect(backup)) as db:
             self.assertEqual(db.execute('PRAGMA user_version').fetchone()[0],2)
-        self.assertEqual(self.conn.execute('PRAGMA user_version').fetchone()[0],3)
+        self.assertEqual(self.conn.execute('PRAGMA user_version').fetchone()[0],4)
         self.assertEqual(self.conn.execute('SELECT mentions FROM social_observations').fetchone()[0],0)
         self.assertIsNone(migrate(self.conn,self.path))
 

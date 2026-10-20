@@ -89,6 +89,9 @@ def run_scan(cfg, detector=None, social_provider=None):
     scan_id = None
     try:
         conn = connect(cfg["database"]["path"])
+        # Retention applies even when experimental collection is disabled.
+        from .attention_maintenance import prune
+        prune(conn, now_utc())
         config_json, config_hash = snapshot(cfg)
         scan_id = conn.execute("""INSERT INTO scan_runs
             (started_ts,status,config_json,config_hash,app_version,scoring_version)

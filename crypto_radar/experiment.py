@@ -79,8 +79,8 @@ def collect_providers(conn,scan_id,markets,now,collection,clock):
                          ('social:'+name,)).fetchone()
         if row: history[name]=tuple(row)
     states=[]; errors=0; total=0
-    for batch in collection.batches(markets,now,clock,history):
-        count=0; failures=0
+    for batch in collection.batches(markets,now,clock,history,conn=conn):
+        count=batch.persisted_count; failures=0
         for item in batch.observations:
             try:
                 # Safe numeric native metrics, separate from normalized research.
