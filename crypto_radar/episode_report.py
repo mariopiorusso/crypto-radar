@@ -152,7 +152,8 @@ def _report(db):
         warnings.append('No collector runs recorded; collector availability is unknown.')
     if not groups:
         warnings.append('No evaluable episode cohorts.')
-    return dict(report_version=1, methodology={
+    from .attention_report import report as attention_report
+    return dict(report_version=1, attention=attention_report(db), methodology={
         'weighting': 'Mean available evaluations per episode/version/group/horizon, then equal-weight mean and median of episode means, independently per metric.',
         'absolute_return': 'Signed unadjusted return_pct in percent, not the magnitude of return.',
         'lead_lag': 'Minutes from first recorded episode signal to recorded significant move; positive means signal preceded move. One pair per episode, independent of horizon.',

@@ -26,6 +26,9 @@ TIMES = {
     'benchmark_context': 'observed_ts', 'experiment_outcomes': 'target_ts',
     'benchmark_outcomes': 'observed_ts', 'v12_ai_calls': 'reserved_ts',
     'provider_social_observations': 'observed_ts',
+    'attention_runs': 'observed_ts', 'apewisdom_snapshots': 'observed_ts',
+    'x_posts': 'first_seen_ts', 'x_post_assets': 'first_seen_ts',
+    'x_post_metrics': 'observed_ts', 'provider_usage': 'reserved_ts',
 }
 
 
@@ -393,9 +396,10 @@ def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=No
                 conn.execute('ATTACH DATABASE ? AS src', (backup.as_uri()+'?mode=ro',))
                 tables = {r[0] for r in conn.execute("SELECT name FROM src.sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
                 version = conn.execute('PRAGMA src.user_version').fetchone()[0]
-                expected=set(TIMES) - ({'provider_social_observations'} if version==2 else set())
-                if tables != expected or version not in (2,3):
-                    raise ValueError('Unsupported source schema; retention policy requires schema v2/v3 tables')
+                v4_tables={'attention_runs','apewisdom_snapshots','x_posts','x_post_assets','x_post_metrics','provider_usage'}
+                expected=set(TIMES) - (v4_tables if version<4 else set()) - ({'provider_social_observations'} if version==2 else set())
+                if tables != expected or version not in (2,3,4):
+                    raise ValueError('Unsupported source schema; retention policy requires schema v2/v3/v4 tables')
                 source_schema = list(conn.execute("SELECT name,sql FROM src.sqlite_master WHERE sql IS NOT NULL ORDER BY name"))
                 conn.execute('CREATE TABLE snapshot_source_schema (name TEXT PRIMARY KEY, sql TEXT)')
                 conn.executemany('INSERT INTO snapshot_source_schema VALUES (?,?)', source_schema)

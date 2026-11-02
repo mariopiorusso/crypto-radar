@@ -1,0 +1,3699 @@
+{
+  "as_of": "2026-11-02T11:06:35.402851+00:00",
+  "comparisons": {
+    "groups": [
+      {
+        "distinct_assets": 0,
+        "group": "no_observed_upstream_signal",
+        "horizons": [
+          {
+            "hours": 1,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 3,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 6,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 12,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 24,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          }
+        ],
+        "independent_episode_ids": 0,
+        "lead_minutes": {
+          "mean": null,
+          "median": null,
+          "n": 0
+        },
+        "missing_apewisdom_episodes": 0
+      },
+      {
+        "distinct_assets": 77,
+        "group": "news",
+        "horizons": [
+          {
+            "hours": 1,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.18483036724387872,
+                "measured_episodes": 152,
+                "median": 0.07448474869490786,
+                "missing_episodes": 52,
+                "n": 152,
+                "positive_frequency": 0.5460526315789473,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.22467151247640607,
+                "measured_episodes": 200,
+                "median": 0.12949254871614246,
+                "missing_episodes": 4,
+                "n": 200,
+                "positive_frequency": 0.585,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.20892178640000095,
+                "measured_episodes": 200,
+                "median": 0.12915793826954736,
+                "missing_episodes": 4,
+                "n": 200,
+                "positive_frequency": 0.58,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.20691706432824059,
+                "measured_episodes": 200,
+                "median": 0.07369284567947387,
+                "missing_episodes": 4,
+                "n": 200,
+                "positive_frequency": 0.555,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 3,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.25383874648268356,
+                "measured_episodes": 100,
+                "median": 0.07281752039237141,
+                "missing_episodes": 104,
+                "n": 100,
+                "positive_frequency": 0.53,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.3129995416238599,
+                "measured_episodes": 198,
+                "median": 0.23348821617767967,
+                "missing_episodes": 6,
+                "n": 198,
+                "positive_frequency": 0.5505050505050505,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.2839032832696067,
+                "measured_episodes": 198,
+                "median": 0.09742079676667847,
+                "missing_episodes": 6,
+                "n": 198,
+                "positive_frequency": 0.5606060606060606,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.3585659841089733,
+                "measured_episodes": 198,
+                "median": 0.29995582206497895,
+                "missing_episodes": 6,
+                "n": 198,
+                "positive_frequency": 0.5505050505050505,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 6,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.4590757104905847,
+                "measured_episodes": 83,
+                "median": -0.11748072108302698,
+                "missing_episodes": 121,
+                "n": 83,
+                "positive_frequency": 0.46987951807228917,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.49275900277757256,
+                "measured_episodes": 197,
+                "median": 0.04465576517829195,
+                "missing_episodes": 7,
+                "n": 197,
+                "positive_frequency": 0.5126903553299492,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.4663435861375587,
+                "measured_episodes": 197,
+                "median": 0.09002880016426573,
+                "missing_episodes": 7,
+                "n": 197,
+                "positive_frequency": 0.5126903553299492,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.6284715319840848,
+                "measured_episodes": 197,
+                "median": 0.32637075718016106,
+                "missing_episodes": 7,
+                "n": 197,
+                "positive_frequency": 0.5532994923857868,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 12,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.668952007968052,
+                "measured_episodes": 60,
+                "median": 0.18810611558547163,
+                "missing_episodes": 144,
+                "n": 60,
+                "positive_frequency": 0.55,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.5769608298027689,
+                "measured_episodes": 196,
+                "median": 0.3257599853416615,
+                "missing_episodes": 8,
+                "n": 196,
+                "positive_frequency": 0.5561224489795918,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.6179886671989453,
+                "measured_episodes": 196,
+                "median": 0.25327128853316894,
+                "missing_episodes": 8,
+                "n": 196,
+                "positive_frequency": 0.5918367346938775,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.5574380691278766,
+                "measured_episodes": 196,
+                "median": 0.2243646834782398,
+                "missing_episodes": 8,
+                "n": 196,
+                "positive_frequency": 0.5306122448979592,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 24,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 1.1341583942681754,
+                "measured_episodes": 36,
+                "median": 0.627815917290428,
+                "missing_episodes": 168,
+                "n": 36,
+                "positive_frequency": 0.6666666666666666,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.4711510770579772,
+                "measured_episodes": 186,
+                "median": -0.4667211084309897,
+                "missing_episodes": 18,
+                "n": 186,
+                "positive_frequency": 0.40860215053763443,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.26005544066952335,
+                "measured_episodes": 186,
+                "median": -0.31745586077503996,
+                "missing_episodes": 18,
+                "n": 186,
+                "positive_frequency": 0.43548387096774194,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.8778990374288069,
+                "measured_episodes": 186,
+                "median": -0.5360913038427506,
+                "missing_episodes": 18,
+                "n": 186,
+                "positive_frequency": 0.3870967741935484,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          }
+        ],
+        "independent_episode_ids": 204,
+        "lead_minutes": {
+          "mean": 457.1917520380952,
+          "median": 347.96657335,
+          "n": 42
+        },
+        "missing_apewisdom_episodes": 204
+      },
+      {
+        "distinct_assets": 19,
+        "group": "market",
+        "horizons": [
+          {
+            "hours": 1,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.04260576893190617,
+                "measured_episodes": 29,
+                "median": 0.0020799662742211444,
+                "missing_episodes": 4,
+                "n": 29,
+                "positive_frequency": 0.5172413793103449,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.089331001646039,
+                "measured_episodes": 32,
+                "median": 9.536908063267902e-05,
+                "missing_episodes": 1,
+                "n": 32,
+                "positive_frequency": 0.5,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.05496556517483285,
+                "measured_episodes": 32,
+                "median": -0.014294663484498704,
+                "missing_episodes": 1,
+                "n": 32,
+                "positive_frequency": 0.5,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.07907403520297264,
+                "measured_episodes": 32,
+                "median": 0.0,
+                "missing_episodes": 1,
+                "n": 32,
+                "positive_frequency": 0.4375,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 3,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.07237388589598846,
+                "measured_episodes": 20,
+                "median": -0.022283092509200797,
+                "missing_episodes": 13,
+                "n": 20,
+                "positive_frequency": 0.5,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.5253142229448418,
+                "measured_episodes": 32,
+                "median": 0.06963305924240215,
+                "missing_episodes": 1,
+                "n": 32,
+                "positive_frequency": 0.59375,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.440302665814794,
+                "measured_episodes": 32,
+                "median": 0.03942298062843408,
+                "missing_episodes": 1,
+                "n": 32,
+                "positive_frequency": 0.53125,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.38116255464704585,
+                "measured_episodes": 32,
+                "median": 0.0,
+                "missing_episodes": 1,
+                "n": 32,
+                "positive_frequency": 0.4375,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 6,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.030023411722587656,
+                "measured_episodes": 16,
+                "median": 0.0350908049666591,
+                "missing_episodes": 17,
+                "n": 16,
+                "positive_frequency": 0.5,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.581223872889866,
+                "measured_episodes": 31,
+                "median": 0.1329368016323884,
+                "missing_episodes": 2,
+                "n": 31,
+                "positive_frequency": 0.5806451612903226,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.5440133869818667,
+                "measured_episodes": 31,
+                "median": 0.11069247842699914,
+                "missing_episodes": 2,
+                "n": 31,
+                "positive_frequency": 0.6129032258064516,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.48256706765583757,
+                "measured_episodes": 31,
+                "median": 0.0,
+                "missing_episodes": 2,
+                "n": 31,
+                "positive_frequency": 0.45161290322580644,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 12,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.024885967715791605,
+                "measured_episodes": 8,
+                "median": -0.08422001992528654,
+                "missing_episodes": 25,
+                "n": 8,
+                "positive_frequency": 0.375,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.7016068907805947,
+                "measured_episodes": 29,
+                "median": 0.17154590965788863,
+                "missing_episodes": 4,
+                "n": 29,
+                "positive_frequency": 0.5862068965517241,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.5761336588227838,
+                "measured_episodes": 29,
+                "median": 0.019319440509013575,
+                "missing_episodes": 4,
+                "n": 29,
+                "positive_frequency": 0.5172413793103449,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.5674218140155636,
+                "measured_episodes": 29,
+                "median": 0.0,
+                "missing_episodes": 4,
+                "n": 29,
+                "positive_frequency": 0.41379310344827586,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 24,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.040196315571554515,
+                "measured_episodes": 6,
+                "median": -0.12741423943623767,
+                "missing_episodes": 27,
+                "n": 6,
+                "positive_frequency": 0.3333333333333333,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.3577594487240515,
+                "measured_episodes": 28,
+                "median": 0.06194597347796149,
+                "missing_episodes": 5,
+                "n": 28,
+                "positive_frequency": 0.5357142857142857,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.3803146522814589,
+                "measured_episodes": 28,
+                "median": -0.20688998326394703,
+                "missing_episodes": 5,
+                "n": 28,
+                "positive_frequency": 0.42857142857142855,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": -1.2050307439041406,
+                "measured_episodes": 28,
+                "median": -0.2460525157820359,
+                "missing_episodes": 5,
+                "n": 28,
+                "positive_frequency": 0.32142857142857145,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          }
+        ],
+        "independent_episode_ids": 33,
+        "lead_minutes": {
+          "mean": 367.7169032111111,
+          "median": 463.86602351666664,
+          "n": 3
+        },
+        "missing_apewisdom_episodes": 33
+      },
+      {
+        "distinct_assets": 0,
+        "group": "apewisdom",
+        "horizons": [
+          {
+            "hours": 1,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 3,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 6,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 12,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 24,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          }
+        ],
+        "independent_episode_ids": 0,
+        "lead_minutes": {
+          "mean": null,
+          "median": null,
+          "n": 0
+        },
+        "missing_apewisdom_episodes": 0
+      },
+      {
+        "distinct_assets": 0,
+        "group": "news+apewisdom",
+        "horizons": [
+          {
+            "hours": 1,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 3,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 6,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 12,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 24,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          }
+        ],
+        "independent_episode_ids": 0,
+        "lead_minutes": {
+          "mean": null,
+          "median": null,
+          "n": 0
+        },
+        "missing_apewisdom_episodes": 0
+      },
+      {
+        "distinct_assets": 0,
+        "group": "market+apewisdom",
+        "horizons": [
+          {
+            "hours": 1,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 3,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 6,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 12,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 24,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          }
+        ],
+        "independent_episode_ids": 0,
+        "lead_minutes": {
+          "mean": null,
+          "median": null,
+          "n": 0
+        },
+        "missing_apewisdom_episodes": 0
+      },
+      {
+        "distinct_assets": 73,
+        "group": "news+market",
+        "horizons": [
+          {
+            "hours": 1,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.1324209211917927,
+                "measured_episodes": 267,
+                "median": 0.11243364426534061,
+                "missing_episodes": 73,
+                "n": 267,
+                "positive_frequency": 0.5805243445692884,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.03726518898779682,
+                "measured_episodes": 339,
+                "median": 0.06847469455997235,
+                "missing_episodes": 1,
+                "n": 339,
+                "positive_frequency": 0.5339233038348082,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.05034316363492428,
+                "measured_episodes": 339,
+                "median": 0.04649409997501408,
+                "missing_episodes": 1,
+                "n": 339,
+                "positive_frequency": 0.5250737463126843,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.03384256290915624,
+                "measured_episodes": 339,
+                "median": 0.0,
+                "missing_episodes": 1,
+                "n": 339,
+                "positive_frequency": 0.46607669616519176,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 3,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.023093331014747913,
+                "measured_episodes": 233,
+                "median": -0.05239629172299687,
+                "missing_episodes": 107,
+                "n": 233,
+                "positive_frequency": 0.48497854077253216,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.026690583347621415,
+                "measured_episodes": 338,
+                "median": -0.02012646278582997,
+                "missing_episodes": 2,
+                "n": 338,
+                "positive_frequency": 0.47928994082840237,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.051156571711782096,
+                "measured_episodes": 338,
+                "median": -0.0337538550223504,
+                "missing_episodes": 2,
+                "n": 338,
+                "positive_frequency": 0.4881656804733728,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.014297624578175563,
+                "measured_episodes": 338,
+                "median": 0.0,
+                "missing_episodes": 2,
+                "n": 338,
+                "positive_frequency": 0.44970414201183434,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 6,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.04507239621196176,
+                "measured_episodes": 183,
+                "median": 0.05863127147940224,
+                "missing_episodes": 157,
+                "n": 183,
+                "positive_frequency": 0.5136612021857924,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.042605236211718425,
+                "measured_episodes": 334,
+                "median": -0.09382291589672964,
+                "missing_episodes": 6,
+                "n": 334,
+                "positive_frequency": 0.47604790419161674,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.009826892908786545,
+                "measured_episodes": 334,
+                "median": -0.076041405470062,
+                "missing_episodes": 6,
+                "n": 334,
+                "positive_frequency": 0.47904191616766467,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": -0.12721744690686682,
+                "measured_episodes": 334,
+                "median": 0.0,
+                "missing_episodes": 6,
+                "n": 334,
+                "positive_frequency": 0.46407185628742514,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 12,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.44860049834961246,
+                "measured_episodes": 110,
+                "median": 0.08333285433234831,
+                "missing_episodes": 230,
+                "n": 110,
+                "positive_frequency": 0.5454545454545454,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.2600727666998288,
+                "measured_episodes": 321,
+                "median": 0.03368444199161047,
+                "missing_episodes": 19,
+                "n": 321,
+                "positive_frequency": 0.5077881619937694,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.2336560384284815,
+                "measured_episodes": 321,
+                "median": 0.07041285424526089,
+                "missing_episodes": 19,
+                "n": 321,
+                "positive_frequency": 0.5233644859813084,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.22973758125614327,
+                "measured_episodes": 321,
+                "median": 0.04562249188850842,
+                "missing_episodes": 19,
+                "n": 321,
+                "positive_frequency": 0.5171339563862928,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 24,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.36474175768506395,
+                "measured_episodes": 77,
+                "median": -0.42589744930395534,
+                "missing_episodes": 263,
+                "n": 77,
+                "positive_frequency": 0.44155844155844154,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.4343813338818941,
+                "measured_episodes": 310,
+                "median": -0.14271197451186657,
+                "missing_episodes": 30,
+                "n": 310,
+                "positive_frequency": 0.4774193548387097,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.4356923313099153,
+                "measured_episodes": 310,
+                "median": -0.06117652557252051,
+                "missing_episodes": 30,
+                "n": 310,
+                "positive_frequency": 0.4870967741935484,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": false,
+                "mean": 0.3338258972587437,
+                "measured_episodes": 310,
+                "median": 0.0,
+                "missing_episodes": 30,
+                "n": 310,
+                "positive_frequency": 0.4838709677419355,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          }
+        ],
+        "independent_episode_ids": 340,
+        "lead_minutes": {
+          "mean": 442.03014657355556,
+          "median": 343.4796639166667,
+          "n": 75
+        },
+        "missing_apewisdom_episodes": 340
+      },
+      {
+        "distinct_assets": 0,
+        "group": "news+market+apewisdom",
+        "horizons": [
+          {
+            "hours": 1,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 3,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 6,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 12,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          },
+          {
+            "hours": 24,
+            "metrics": {
+              "excess_broad_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_btc_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "excess_eth_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              },
+              "return_pct": {
+                "estimate_suppressed": true,
+                "mean": null,
+                "measured_episodes": 0,
+                "median": null,
+                "missing_episodes": 0,
+                "n": 0,
+                "positive_frequency": null,
+                "uncertainty": null,
+                "uncertainty_reason": "Asset and time dependence; no validated independent-block inference."
+              }
+            }
+          }
+        ],
+        "independent_episode_ids": 0,
+        "lead_minutes": {
+          "mean": null,
+          "median": null,
+          "n": 0
+        },
+        "missing_apewisdom_episodes": 0
+      }
+    ],
+    "matched_asset_day_strata": 577,
+    "matching_limit": "No adjusted comparison without prespecified regime matching and sufficient common support. No-signal means no observed signal, not verified absence.",
+    "mixed_group_matched_strata": 0,
+    "overlapping_same_asset_24h_anchor_pairs": 0,
+    "selection": "Earliest retained V1.1 evaluation per existing episode, fixed before outcomes; excluded or invalid first evaluations are omitted, never replaced by a later favorable sample.",
+    "social_positive_episodes": 0,
+    "status": "insufficient_social_data"
+  },
+  "decision": "B: correct/monitor asset resolution and data availability; continue observation. No detector change justified.",
+  "full_report_canonical_sha256": "e3cca3a6c60ebd2c56446620f8cc6462cbb921e119405d0384ecdd5259a7c4ed",
+  "health": {
+    "ambiguous_configured_tickers": [],
+    "changed_response_age_seconds": 1224.584301,
+    "changed_response_interval_seconds": {
+      "mean": null,
+      "median": null,
+      "n": 0
+    },
+    "collector_states": [
+      {
+        "runs": 1,
+        "status": "available"
+      },
+      {
+        "runs": 4,
+        "status": "cooldown"
+      }
+    ],
+    "coverage": [
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "aave",
+        "configured_ticker": "AAVE.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "algorand",
+        "configured_ticker": "ALGO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "aptos",
+        "configured_ticker": "APT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "arbitrum",
+        "configured_ticker": "ARB.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "aster-2",
+        "configured_ticker": "ASTER.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "avalanche-2",
+        "configured_ticker": "AVAX.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "beldex",
+        "configured_ticker": "BDX.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "bfusd",
+        "configured_ticker": "BFUSD.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "binancecoin",
+        "configured_ticker": "BNB.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "bitcoin",
+        "configured_ticker": "BTC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "bitcoin-cash",
+        "configured_ticker": "BCH.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "bitget-token",
+        "configured_ticker": "BGB.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "bittensor",
+        "configured_ticker": "TAO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "bitway",
+        "configured_ticker": "BTW.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "blackrock-usd-institutional-digital-liquidity-fund",
+        "configured_ticker": "BUIDL.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "blockstack",
+        "configured_ticker": "STX.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "canton-network",
+        "configured_ticker": "CC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "cardano",
+        "configured_ticker": "ADA.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "chainlink",
+        "configured_ticker": "LINK.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "cosmos",
+        "configured_ticker": "ATOM.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "crypto-com-chain",
+        "configured_ticker": "CRO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "dai",
+        "configured_ticker": "DAI.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "dash",
+        "configured_ticker": "DASH.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "dogecoin",
+        "configured_ticker": "DOGE.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ethena",
+        "configured_ticker": "ENA.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ethena-usde",
+        "configured_ticker": "USDE.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ether-fi",
+        "configured_ticker": "ETHFI.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ethereum",
+        "configured_ticker": "ETH.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ethereum-classic",
+        "configured_ticker": "ETC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "falcon-finance",
+        "configured_ticker": "USDF.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "figure-heloc",
+        "configured_ticker": "FIGR_HELOC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "filecoin",
+        "configured_ticker": "FIL.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "gatechain-token",
+        "configured_ticker": "GT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "gho",
+        "configured_ticker": "GHO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "global-dollar",
+        "configured_ticker": "USDG.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "hashnote-usyc",
+        "configured_ticker": "USYC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "hedera-hashgraph",
+        "configured_ticker": "HBAR.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "htx-dao",
+        "configured_ticker": "HTX.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "hyperliquid",
+        "configured_ticker": "HYPE.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "injective-protocol",
+        "configured_ticker": "INJ.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "internet-computer",
+        "configured_ticker": "ICP.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "janus-henderson-anemoy-aaa-clo-fund",
+        "configured_ticker": "JAAA.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "jupiter-exchange-solana",
+        "configured_ticker": "JUP.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "just",
+        "configured_ticker": "JST.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "kaspa",
+        "configured_ticker": "KAS.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "kucoin-shares",
+        "configured_ticker": "KCS.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "layerzero",
+        "configured_ticker": "ZRO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "leo-token",
+        "configured_ticker": "LEO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "lighter",
+        "configured_ticker": "LIT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "litecoin",
+        "configured_ticker": "LTC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "mantle",
+        "configured_ticker": "MNT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "memecore",
+        "configured_ticker": "M.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "midnight-3",
+        "configured_ticker": "NIGHT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "monero",
+        "configured_ticker": "XMR.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "morpho",
+        "configured_ticker": "MORPHO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "near",
+        "configured_ticker": "NEAR.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "nexo",
+        "configured_ticker": "NEXO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "okb",
+        "configured_ticker": "OKB.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ondo-finance",
+        "configured_ticker": "ONDO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ondo-us-dollar-yield",
+        "configured_ticker": "USDY.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "open-usd",
+        "configured_ticker": "OUSD.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "pancakeswap-token",
+        "configured_ticker": "CAKE.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "pax-gold",
+        "configured_ticker": "PAXG.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "paypal-usd",
+        "configured_ticker": "PYUSD.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "pearl-2",
+        "configured_ticker": "PEARL.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "pepe",
+        "configured_ticker": "PEPE.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "pi-network",
+        "configured_ticker": "PI.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "polkadot",
+        "configured_ticker": "DOT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "polygon-ecosystem-token",
+        "configured_ticker": "POL.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "pump-fun",
+        "configured_ticker": "PUMP.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "quant-network",
+        "configured_ticker": "QNT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "rain",
+        "configured_ticker": "RAIN.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "render-token",
+        "configured_ticker": "RENDER.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ripple",
+        "configured_ticker": "XRP.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "ripple-usd",
+        "configured_ticker": "RLUSD.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "shiba-inu",
+        "configured_ticker": "SHIB.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "sky",
+        "configured_ticker": "SKY.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "solana",
+        "configured_ticker": "SOL.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "spiko-amundi-overnight-swap-fund-eur",
+        "configured_ticker": "EURSAFO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "stellar",
+        "configured_ticker": "XLM.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "sui",
+        "configured_ticker": "SUI.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "superstate-short-duration-us-government-securities-fund-ustb",
+        "configured_ticker": "USTB.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "tether",
+        "configured_ticker": "USDT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "tether-gold",
+        "configured_ticker": "XAUT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "the-open-network",
+        "configured_ticker": "GRAM.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "tron",
+        "configured_ticker": "TRX.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "uniswap",
+        "configured_ticker": "UNI.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "united-stables",
+        "configured_ticker": "U.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "usd-coin",
+        "configured_ticker": "USDC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "usd1-wlfi",
+        "configured_ticker": "USD1.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "usdd",
+        "configured_ticker": "USDD.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "usdgo",
+        "configured_ticker": "USDGO.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "usds",
+        "configured_ticker": "USDS.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "usual-usd",
+        "configured_ticker": "USD0.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "venice-token",
+        "configured_ticker": "VVV.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "whitebit",
+        "configured_ticker": "WBT.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "world-liberty-financial",
+        "configured_ticker": "WLFI.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "worldcoin-wld",
+        "configured_ticker": "WLD.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "xdce-crowd-sale",
+        "configured_ticker": "XDC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      },
+      {
+        "accepted_samples": 0,
+        "availability": false,
+        "coin_id": "zcash",
+        "configured_ticker": "ZEC.X",
+        "first": null,
+        "indicators": [],
+        "last": null,
+        "receipt_age_seconds": null,
+        "rows": 0
+      }
+    ],
+    "data_status": "unresolved",
+    "distinct_resolved_assets": 0,
+    "duplicate_keys": 0,
+    "first_observation": "2026-11-02T10:46:10.818550+00:00",
+    "last_changed_response": "2026-11-02T10:46:10.818550+00:00",
+    "last_observation": "2026-11-02T10:46:10.818550+00:00",
+    "last_successful_collection": "2026-11-02T10:46:10.818550+00:00",
+    "observation_rows": 5,
+    "ongoing_gap_seconds": 1224.584301,
+    "poll_interval_seconds": {
+      "mean": null,
+      "median": null,
+      "n": 0
+    },
+    "polling_gaps": [],
+    "provider": "apewisdom",
+    "provider_refresh_frequency": "Unknown: no provider update timestamp; changed receipts only bound observed response changes.",
+    "provider_timestamp_rows": 0,
+    "repeated_responses": 0,
+    "run_states": {
+      "available": 1
+    },
+    "timestamp_errors": 0,
+    "unresolved_tickers": {
+      "BTC.X": 1,
+      "ID.X": 1,
+      "LINK.X": 1,
+      "XMR.X": 1,
+      "XRP.X": 1
+    }
+  },
+  "report_version": 1,
+  "representative_episodes": [
+    {
+      "anchor_ts": "2026-09-22T19:44:40.882073+00:00",
+      "coin_id": "bitcoin-cash",
+      "definition_version": "fixed-anchor-1.2",
+      "episode_id": 1,
+      "first_candidate_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 26.98,
+        "components": {
+          "early_move": 0,
+          "volume_marketcap": 18.26027680214253,
+          "volume_ratio": 20,
+          "volume_z": 14.302141064603417
+        },
+        "decision": "suppressed",
+        "detected_ts": "2026-09-22T20:48:51.035275+00:00",
+        "evaluation_id": 21,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-09-22T20:48:51.035275+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 543.072547,
+        "reason": "daily_budget",
+        "scan_duration_seconds": 0.629103,
+        "score": 52.6,
+        "source_age_seconds": 251.035275,
+        "threshold": 45,
+        "threshold_shortfall": 0,
+        "volume_vs_baseline": 2.38,
+        "volume_z": 2.38
+      },
+      "last_pre_move_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 28.75,
+        "components": {
+          "early_move": 0,
+          "volume_marketcap": 21.584398159579298,
+          "volume_ratio": 13.067919840284805,
+          "volume_z": 0
+        },
+        "decision": "rejected",
+        "detected_ts": "2026-09-23T06:02:06.079148+00:00",
+        "evaluation_id": 21121,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-09-23T06:02:06.079148+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 305.286623,
+        "reason": "below_threshold",
+        "scan_duration_seconds": 4.967588,
+        "score": 34.7,
+        "source_age_seconds": 186.079148,
+        "threshold": 45,
+        "threshold_shortfall": 10.299999999999997,
+        "volume_vs_baseline": 1.65,
+        "volume_z": 1.43
+      },
+      "last_signal_ts": "2026-09-24T19:53:48.911827+00:00",
+      "lead_minutes": {
+        "apewisdom_observation": null,
+        "market_anomaly": 558.33378275,
+        "news_event": 520.34331265,
+        "news_observation": 520.3867216333333,
+        "v11_candidate": 558.33378275
+      },
+      "move_crossing_bracket_seconds": 304.983092,
+      "move_reproduced": true,
+      "news_publication_to_receipt_seconds": 16487.858942,
+      "recomputed_move_ts": "2026-09-23T06:07:11.062240+00:00",
+      "signals": {
+        "apewisdom_observation": null,
+        "market_anomaly": "2026-09-22T20:48:51.035275+00:00",
+        "news_event": "2026-09-22T21:26:50.463481+00:00",
+        "news_observation": "2026-09-22T21:26:47.858942+00:00",
+        "v11_candidate": "2026-09-22T20:48:51.035275+00:00"
+      },
+      "significant_move_ts": "2026-09-23T06:07:11.062240+00:00",
+      "started_ts": "2026-09-22T20:48:51.035275+00:00"
+    },
+    {
+      "anchor_ts": "2026-09-22T19:49:41.430926+00:00",
+      "coin_id": "sky",
+      "definition_version": "fixed-anchor-1.2",
+      "episode_id": 5,
+      "first_candidate_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 10.98,
+        "components": {
+          "early_move": 0,
+          "volume_marketcap": 2.501357533515484,
+          "volume_ratio": 19.418659340029294,
+          "volume_z": 23.533403688033083
+        },
+        "decision": "assessed",
+        "detected_ts": "2026-09-23T15:13:50.634838+00:00",
+        "evaluation_id": 42757,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-09-23T15:13:50.634838+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 305.541392,
+        "reason": null,
+        "scan_duration_seconds": 19.869689,
+        "score": 45.5,
+        "source_age_seconds": 250.634838,
+        "threshold": 45,
+        "threshold_shortfall": 0,
+        "volume_vs_baseline": 1.97,
+        "volume_z": 3.92
+      },
+      "last_pre_move_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 4.52,
+        "components": {
+          "early_move": 8.219865,
+          "volume_marketcap": 1.240201203710079,
+          "volume_ratio": 0,
+          "volume_z": 13.065095455897971
+        },
+        "decision": "rejected",
+        "detected_ts": "2026-09-23T04:30:27.707803+00:00",
+        "evaluation_id": 17559,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-09-23T04:30:27.707803+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 304.557,
+        "reason": "below_threshold",
+        "scan_duration_seconds": 4.64484,
+        "score": 22.5,
+        "source_age_seconds": 197.707803,
+        "threshold": 45,
+        "threshold_shortfall": 22.5,
+        "volume_vs_baseline": 1.17,
+        "volume_z": 2.18
+      },
+      "last_signal_ts": "2026-09-24T17:45:46.731505+00:00",
+      "lead_minutes": {
+        "apewisdom_observation": null,
+        "market_anomaly": 463.86602351666664,
+        "news_event": 398.22474735000003,
+        "news_observation": 398.27209261666667,
+        "v11_candidate": -638.3048172333333
+      },
+      "move_crossing_bracket_seconds": 304.638001,
+      "move_reproduced": true,
+      "news_publication_to_receipt_seconds": 5836.020247,
+      "recomputed_move_ts": "2026-09-23T04:35:32.345804+00:00",
+      "signals": {
+        "apewisdom_observation": null,
+        "market_anomaly": "2026-09-22T20:51:40.384393+00:00",
+        "news_event": "2026-09-22T21:57:18.860963+00:00",
+        "news_observation": "2026-09-22T21:57:16.020247+00:00",
+        "v11_candidate": "2026-09-23T15:13:50.634838+00:00"
+      },
+      "significant_move_ts": "2026-09-23T04:35:32.345804+00:00",
+      "started_ts": "2026-09-22T20:51:40.384393+00:00"
+    },
+    {
+      "anchor_ts": "2026-09-22T19:59:43.130202+00:00",
+      "coin_id": "uniswap",
+      "definition_version": "fixed-anchor-1.2",
+      "episode_id": 7,
+      "first_candidate_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 9.75,
+        "components": {
+          "early_move": 0.37654500000000013,
+          "volume_marketcap": 27.652514833738657,
+          "volume_ratio": 5.546901519301954,
+          "volume_z": 13.144536508190196
+        },
+        "decision": "suppressed",
+        "detected_ts": "2026-09-22T22:22:38.972355+00:00",
+        "evaluation_id": 3122,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-09-22T22:22:38.972355+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 304.775437,
+        "reason": "daily_budget",
+        "scan_duration_seconds": 5.098636,
+        "score": 46.7,
+        "source_age_seconds": 208.972355,
+        "threshold": 45,
+        "threshold_shortfall": 0,
+        "volume_vs_baseline": 1.28,
+        "volume_z": 2.19
+      },
+      "last_pre_move_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 7.46,
+        "components": {
+          "early_move": 3.8135699999999986,
+          "volume_marketcap": 27.381790209004148,
+          "volume_ratio": 0,
+          "volume_z": 0
+        },
+        "decision": "rejected",
+        "detected_ts": "2026-09-22T22:17:34.196918+00:00",
+        "evaluation_id": 2922,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-09-22T22:17:34.196918+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 304.776887,
+        "reason": "below_threshold",
+        "scan_duration_seconds": 4.739118,
+        "score": 31.2,
+        "source_age_seconds": 204.196918,
+        "threshold": 45,
+        "threshold_shortfall": 13.8,
+        "volume_vs_baseline": 1.23,
+        "volume_z": 1.86
+      },
+      "last_signal_ts": "2026-09-24T22:22:36.459034+00:00",
+      "lead_minutes": {
+        "apewisdom_observation": null,
+        "market_anomaly": 80.95090336666667,
+        "news_event": 20.258551833333335,
+        "news_observation": 20.30268476666667,
+        "v11_candidate": 0.0
+      },
+      "move_crossing_bracket_seconds": 304.775437,
+      "move_reproduced": true,
+      "news_publication_to_receipt_seconds": 29169.811269,
+      "recomputed_move_ts": "2026-09-22T22:22:38.972355+00:00",
+      "signals": {
+        "apewisdom_observation": null,
+        "market_anomaly": "2026-09-22T21:01:41.918153+00:00",
+        "news_event": "2026-09-22T22:02:23.459245+00:00",
+        "news_observation": "2026-09-22T22:02:20.811269+00:00",
+        "v11_candidate": "2026-09-22T22:22:38.972355+00:00"
+      },
+      "significant_move_ts": "2026-09-22T22:22:38.972355+00:00",
+      "started_ts": "2026-09-22T21:01:41.918153+00:00"
+    },
+    {
+      "anchor_ts": "2026-09-22T20:29:46.766545+00:00",
+      "coin_id": "ether-fi",
+      "definition_version": "fixed-anchor-1.2",
+      "episode_id": 20,
+      "first_candidate_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 14.4,
+        "components": {
+          "early_move": 0,
+          "volume_marketcap": 14.322488302133825,
+          "volume_ratio": 15.402320019650766,
+          "volume_z": 35
+        },
+        "decision": "assessed",
+        "detected_ts": "2026-09-30T01:40:25.387059+00:00",
+        "evaluation_id": 352593,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-09-30T01:40:25.387059+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 75677.579373,
+        "reason": null,
+        "scan_duration_seconds": 145.179794,
+        "score": 64.7,
+        "source_age_seconds": 125.387059,
+        "threshold": 45,
+        "threshold_shortfall": 0,
+        "volume_vs_baseline": 1.77,
+        "volume_z": 11.53
+      },
+      "last_pre_move_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 1.62,
+        "components": {
+          "early_move": 12.562575,
+          "volume_marketcap": 8.54691445099079,
+          "volume_ratio": 0,
+          "volume_z": 18.38017297090054
+        },
+        "decision": "rejected",
+        "detected_ts": "2026-09-23T02:48:32.497920+00:00",
+        "evaluation_id": 13596,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-09-23T02:48:32.497920+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 305.180224,
+        "reason": "below_threshold",
+        "scan_duration_seconds": 4.608434,
+        "score": 39.5,
+        "source_age_seconds": 142.49792,
+        "threshold": 45,
+        "threshold_shortfall": 5.5,
+        "volume_vs_baseline": 1.14,
+        "volume_z": 3.06
+      },
+      "last_signal_ts": "2026-10-03T00:15:34.107105+00:00",
+      "lead_minutes": {
+        "apewisdom_observation": null,
+        "market_anomaly": 194.77871915,
+        "news_event": 321.6990515333334,
+        "news_observation": 321.72405605,
+        "v11_candidate": -10006.804659116666
+      },
+      "move_crossing_bracket_seconds": 304.609592,
+      "move_reproduced": true,
+      "news_publication_to_receipt_seconds": 31544.664149,
+      "recomputed_move_ts": "2026-09-23T02:53:37.107512+00:00",
+      "signals": {
+        "apewisdom_observation": null,
+        "market_anomaly": "2026-09-22T23:38:50.384363+00:00",
+        "news_event": "2026-09-22T21:31:55.164420+00:00",
+        "news_observation": "2026-09-22T21:31:53.664149+00:00",
+        "v11_candidate": "2026-09-30T01:40:25.387059+00:00"
+      },
+      "significant_move_ts": "2026-09-23T02:53:37.107512+00:00",
+      "started_ts": "2026-09-22T21:31:55.164420+00:00"
+    },
+    {
+      "anchor_ts": "2026-09-25T04:42:47.629296+00:00",
+      "coin_id": "akedo",
+      "definition_version": "fixed-anchor-1.2",
+      "episode_id": 85,
+      "first_candidate_evaluation": {
+        "anomaly_threshold": 2.0,
+        "change_24h": 12.2,
+        "components": {
+          "early_move": 0,
+          "volume_marketcap": 1.5411646018693845,
+          "volume_ratio": 11.143532088407744,
+          "volume_z": 35
+        },
+        "decision": "assessed",
+        "detected_ts": "2026-10-08T10:22:54.219292+00:00",
+        "evaluation_id": 821194,
+        "history_count": 287,
+        "market_to_detection_seconds": 0.0,
+        "market_ts": "2026-10-08T10:22:54.219292+00:00",
+        "min_history_points": 6,
+        "preceding_market_interval_seconds": 307.030116,
+        "reason": null,
+        "scan_duration_seconds": 13.878343,
+        "score": 47.7,
+        "source_age_seconds": 58.219292,
+        "threshold": 45,
+        "threshold_shortfall": 0,
+        "volume_vs_baseline": 1.56,
+        "volume_z": 7.56
+      },
+      "last_pre_move_evaluation": null,
+      "last_signal_ts": "2026-10-22T12:13:03.414284+00:00",
+      "lead_minutes": {
+        "apewisdom_observation": null,
+        "market_anomaly": -5.086202599999999,
+        "news_event": -34931.286775266664,
+        "news_observation": -107.21699236666667,
+        "v11_candidate": -19003.851368099997
+      },
+      "move_crossing_bracket_seconds": 311.459514,
+      "move_reproduced": true,
+      "news_publication_to_receipt_seconds": 19565.156748,
+      "recomputed_move_ts": "2026-09-25T05:39:03.137206+00:00",
+      "signals": {
+        "apewisdom_observation": null,
+        "market_anomaly": "2026-09-25T05:44:08.309362+00:00",
+        "news_event": "2026-10-19T11:50:20.343722+00:00",
+        "news_observation": "2026-09-25T07:26:16.156748+00:00",
+        "v11_candidate": "2026-10-08T10:22:54.219292+00:00"
+      },
+      "significant_move_ts": "2026-09-25T05:39:03.137206+00:00",
+      "started_ts": "2026-09-25T05:44:08.309362+00:00"
+    }
+  ],
+  "runtime": {
+    "access_confirmed": true,
+    "apewisdom_enabled": true,
+    "configured_assets": 100,
+    "permission_evidence": "Operator flag only; provider permission and numeric rate limits are not independently verified.",
+    "poll_seconds": 1800,
+    "providers": [
+      "apewisdom"
+    ],
+    "scan_id": 12849,
+    "social_enabled": true,
+    "v12_enabled": true
+  },
+  "source_schema_version": 4,
+  "timing": {
+    "early": 16,
+    "early_lead_minutes": {
+      "mean": 339.631029359375,
+      "median": 159.92722340833333,
+      "n": 16
+    },
+    "historical_oct29": {
+      "early": 16,
+      "early_lead_minutes": {
+        "mean": 339.631029359375,
+        "median": 159.92722340833333,
+        "n": 16
+      },
+      "nonnegative_lead_minutes": {
+        "mean": 301.89424831944444,
+        "median": 120.32496080833334,
+        "n": 18
+      },
+      "significant_move_episodes": 117,
+      "simultaneous": 2,
+      "v11_candidate_episodes": 73
+    },
+    "late": 55,
+    "late_pre_move_reasons": {
+      "below_threshold": 49,
+      "unrecorded": 6
+    },
+    "move_recomputation_mismatches": [],
+    "signal_chronology": {
+      "apewisdom_observation": {
+        "early": 0,
+        "late": 0,
+        "mean": null,
+        "median": null,
+        "missing_episodes": 120,
+        "n": 0,
+        "simultaneous": 0
+      },
+      "market_anomaly": {
+        "early": 85,
+        "late": 22,
+        "mean": 208.67358620757577,
+        "median": 127.84661918333333,
+        "missing_episodes": 10,
+        "n": 110,
+        "simultaneous": 3
+      },
+      "news_observation": {
+        "early": 108,
+        "late": 12,
+        "mean": 433.70961790694446,
+        "median": 353.99956387500004,
+        "missing_episodes": 0,
+        "n": 120,
+        "simultaneous": 0
+      },
+      "v11_candidate": {
+        "early": 16,
+        "late": 55,
+        "mean": -2398.3791169908677,
+        "median": -370.93121115,
+        "missing_episodes": 47,
+        "n": 73,
+        "simultaneous": 2
+      }
+    },
+    "significant_move_episodes": 120,
+    "simultaneous": 2,
+    "v11_candidate_episodes": 73
+  },
+  "warnings": [
+    "Live rows are observed receipts, not proof of provider update time or coverage of all social activity.",
+    "No social performance claim: require prospective resolved history, baseline maturity and independent episodes.",
+    "Rolling deltas include expirations and corrections; negative values are retained, never interval post counts.",
+    "Existing episode IDs are the sampling unit, but assets/windows can remain correlated; no inferential confidence intervals.",
+    "Chronology summaries are retrospective; cohort membership uses one fixed as-of evaluation and never future signals.",
+    "Move is the first sampled upward threshold crossing from the fixed anchor within its configured window, not true continuous-price onset.",
+    "Historical cutoff cannot undo retrospectively changed episode membership or recover pruned detail.",
+    "As-of observed returns only, within tolerance; missing benchmarks and observations remain null."
+  ]
+}

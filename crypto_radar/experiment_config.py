@@ -6,6 +6,7 @@ DEFAULTS = {
     "enabled": False,
     "max_market_age_seconds": 600,
     "social": {"enabled": False, "provider": "none", "providers": [], "provider_options": {}, "baseline_hours": 24,
+               "attention_max_age_seconds": 900,
                "min_baseline_windows": 12, "min_coverage": 0.8,
                "max_duplicate_fraction": 0.5, "max_top_author_fraction": 0.5},
     "news": {"enabled": True, "assets_per_scan": 10, "poll_minutes": 30,
@@ -66,6 +67,8 @@ def normalize(raw):
     for key in ('baseline_hours', 'min_baseline_windows'):
         if cfg['social'][key] < 1:
             raise ValueError('Social baseline must be positive')
+    if cfg['social']['attention_max_age_seconds'] <= 0:
+        raise ValueError('Attention freshness must be positive')
     for value in cfg['scoring'].values():
         if not 0 < value <= 100:
             raise ValueError('Experimental score thresholds must be in (0,100]')

@@ -454,7 +454,7 @@ class MigrationV12Tests(unittest.TestCase):
                         self.assertEqual(old.execute('SELECT * FROM '+table).fetchall(),records)
                         actual=conn.execute('SELECT * FROM '+table).fetchall()
                         self.assertEqual([r[:len(records[0])] for r in actual] if records else actual,records)
-                self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],3)
+                self.assertEqual(conn.execute('PRAGMA user_version').fetchone()[0],4)
                 self.assertEqual(conn.execute('PRAGMA foreign_key_check').fetchall(),[])
                 self.assertIsNone(migrate(conn,path))
 

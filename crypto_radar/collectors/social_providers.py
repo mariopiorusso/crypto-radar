@@ -1,12 +1,13 @@
 """Provider registry and isolated collection. No provider payload enters research."""
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Literal
+from typing import ClassVar, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .social import SocialObservation
 
 
 class ProviderSettings(BaseModel):
+    asset_map_limit: ClassVar[int] = 50
     model_config = ConfigDict(strict=True, extra='forbid', allow_inf_nan=False)
     enabled: bool = False
     token_env: str = Field(default='STOCKGEIST_API_TOKEN', pattern=r'^[A-Z][A-Z0-9_]*$')
@@ -23,8 +24,8 @@ class ProviderSettings(BaseModel):
     @model_validator(mode='after')
     def mapping(self):
         import re
-        if len(self.asset_map)>50 or len(set(self.asset_map.values()))!=len(self.asset_map):
-            raise ValueError('At most 50 uniquely mapped provider symbols per provider')
+        if len(self.asset_map)>self.asset_map_limit or len(set(self.asset_map.values()))!=len(self.asset_map):
+            raise ValueError(f'At most {self.asset_map_limit} uniquely mapped provider symbols per provider')
         if any(not re.fullmatch(r'[A-Za-z0-9_.-]{1,100}',k) or
                not re.fullmatch(r'[A-Za-z0-9_.-]{1,100}',v) for k,v in self.asset_map.items()):
             raise ValueError('Explicit canonical ID to provider-symbol mapping required')
@@ -44,11 +45,13 @@ class ProviderBatch:
     status: str
     observations: list = field(default_factory=list)
     error: str | None = None
+    persisted_count: int = 0
 
 
 def registry():
     from .stockgeist import StockGeistCollector
-    return {'stockgeist': StockGeistCollector}
+    from .attention import ApeWisdomCollector, XCollector
+    return {'stockgeist': StockGeistCollector, 'apewisdom': ApeWisdomCollector, 'x': XCollector}
 
 
 def settings_for(factory, values):
@@ -70,7 +73,7 @@ class ProviderCollection:
                   for name in cfg.get('providers',[])}
         return cls({name:factories[name](setting) for name,setting in settings.items()},settings)
 
-    def batches(self,assets,now,clock,history=None):
+    def batches(self,assets,now,clock,history=None,conn=None):
         history=history or {}
         for name,collector in self.collectors.items():
             settings=self.settings[name]
@@ -87,6 +90,10 @@ class ProviderCollection:
                 if now < datetime.fromisoformat(timestamp)+timedelta(seconds=delay):
                     yield ProviderBatch(name,'cooldown'); continue
             try:
+                if getattr(collector,'native_evidence',False) is True:
+                    state,count=collector.collect_persist(conn,assets,now,clock)
+                    yield ProviderBatch(name,state,persisted_count=count)
+                    continue
                 rows=collector.collect(assets,now)
                 if not isinstance(rows,list) or len(rows)>100000:
                     raise ValueError('Bounded observation list required')

@@ -69,6 +69,13 @@ def register_evaluation(conn, scan_id, coin, ts, market_ts, version, group, stat
     price = valid_price(coin.get('current_price'))
     anchor = conn.execute('SELECT anchor_price FROM research_episodes WHERE id=?',(episode_id,)).fetchone()
     movement = ret(anchor[0],price) if anchor and price and price > 0 else None
+    # Freeze numeric as-of evidence independently of the shorter raw X retention.
+    # This does not enter scoring or change candidate selection.
+    from .attention_report import features as attention_features
+    stats=dict(stats)
+    age=cfg['v12']['social']['attention_max_age_seconds']
+    stats['attention_evidence']={'asof_ts':ts,'max_age_seconds':age,
+        'values':attention_features(conn,coin['id'],ts,age)}
     eid = conn.execute('''INSERT INTO experiment_evaluations
         (scan_id,coin_id,signal_version,experiment_group,detected_ts,evidence_cutoff_ts,market_ts,start_price,
          episode_id,v11_evaluation_id,social_feature_id,market_score,social_score,news_score,pre_score,
