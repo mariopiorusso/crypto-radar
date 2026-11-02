@@ -84,6 +84,20 @@ class AttentionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             XSettings(post_usd=float('nan'))
 
+    def test_ape_supports_full_scan_mapping_and_provider_suffix(self):
+        mapping = {f'coin-{i}': f'COIN{i}.X' for i in range(100)}
+        self.assertEqual(len(ApeSettings(asset_map=mapping).asset_map), 100)
+        with self.assertRaises(ValueError):
+            ApeSettings(asset_map={**mapping, 'extra': 'EXTRA.X'})
+        with self.assertRaises(ValueError):
+            XSettings(asset_map=mapping)
+        data = fixture('apewisdom.json')
+        data['results'][0]['ticker'] = 'EX.X'
+        self.ape(payload=data, settings=ApeSettings(enabled=True, access_confirmed=True,
+            asset_map={'example': 'EX.X'}))
+        row = self.db.execute("SELECT coin_id FROM apewisdom_snapshots WHERE ticker='EX.X'").fetchone()
+        self.assertEqual(row[0], 'example')
+
     def test_x_dedup_overlapping_queries_privacy_and_observed_cost(self):
         settings=self.settings.model_copy(update={'queries':{'example':'$EX','other':'$OTHER'}})
         collector=XCollector(settings,self.session)

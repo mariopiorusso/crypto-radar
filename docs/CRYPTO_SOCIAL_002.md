@@ -56,7 +56,7 @@ v12:
       apewisdom:
         enabled: false
         access_confirmed: false
-        asset_map: {bitcoin: BTC, ethereum: ETH, solana: SOL}
+        asset_map: {bitcoin: BTC.X, ethereum: ETH.X, solana: SOL.X}
         poll_seconds: 1800
         retry_seconds: 900
         timeout_seconds: 20
@@ -250,3 +250,9 @@ Troubleshooting: inspect `collector_runs` for access/pricing/budget/auth/cooldow
 states, `attention_runs` for search coverage, and `provider_usage` for reservations.
 An unavailable provider is not proof of zero activity. No credentials should be
 added to logs or reports when diagnosing failures.
+
+For read-only collection health, rolling baselines, episode chronology and
+research limitations, see [CRADAR-VALIDATION-003](CRADAR_VALIDATION_003.md).
+ApeWisdom supports up to 100 explicit mappings; StockGeist and X retain their
+50-mapping limit. Use actual provider tickers (the observed crypto format is
+`BTC.X`), not bare symbols. Configured aliases do not establish live coverage.
