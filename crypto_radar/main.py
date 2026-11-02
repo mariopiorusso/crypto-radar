@@ -20,6 +20,7 @@ from .outcomes import create_outcomes, fill_due_outcomes
 from .policies import cooldown_allowed, reserve_call, update_episode, reserve_alert, daily_usage
 from .operational import process_lock, setup_logging
 from . import experiment, experiment_measurement
+from .observation_timing import candidate_features, delivery_receipt
 
 log = logging.getLogger(__name__)
 
@@ -58,16 +59,20 @@ def deliver_alerts(conn, cfg, aid, coin, result, episode, summary):
         summary["alerts_generated"] += 1
         try:
             message_id = sender(text)
+            returned_ts = now_utc().isoformat()
             status = "console" if channel == "console" else "sent"
             conn.execute("UPDATE alert_events SET status=?,message_id=? WHERE id=?",
                          (status, message_id, event_id))
             summary["alerts_sent"] += int(channel != "console")
+            delivery_receipt(log, event_id, channel, status, returned_ts)
         except Exception as exc:
+            returned_ts = now_utc().isoformat()
             # Exception text can contain credentials or recipient addresses.
             conn.execute("UPDATE alert_events SET status='delivery_unknown',error=? WHERE id=?",
                          (type(exc).__name__, event_id))
             summary["errors"] += 1
             log.error("Alert channel=%s delivery uncertain: %s", channel, type(exc).__name__)
+            delivery_receipt(log, event_id, channel, 'delivery_unknown', returned_ts)
         conn.commit()
 
 
@@ -131,6 +136,7 @@ def run_scan(cfg, detector=None, social_provider=None):
                 else:
                     decision, reason = "candidate", None
             eligible = decision == "candidate"
+            candidate_computed_ts = now_utc().isoformat()
             stats_by_coin[coin['id']] = stats
             if detector == 'v12':
                 summary['coins_excluded'] += int(decision == 'excluded')
@@ -140,7 +146,7 @@ def run_scan(cfg, detector=None, social_provider=None):
                 (scan_id,coin_id,market_ts,pre_score,features_json,decision,reason)
                 VALUES (?,?,?,?,?,?,?)""", (scan_id, coin["id"], market_ts,
                 stats["pre_score"] if stats else None,
-                json.dumps(stats, allow_nan=False) if stats else None, decision, reason)).lastrowid
+                json.dumps(candidate_features(stats, market_ts, candidate_computed_ts), allow_nan=False) if stats else None, decision, reason)).lastrowid
             summary["coins_excluded"] += int(decision == "excluded")
             records.append((coin, stats, eid, eligible))
             if eligible:
