@@ -10,6 +10,8 @@ scanner cannot make old evidence look current.
 .\.venv\Scripts\python.exe -B -m crypto_radar.daily_health --db C:\crypto-radar\data\crypto_radar.db --output-dir C:\crypto-radar\data\provider-health
 # Run once in an administrator PowerShell:
 .\install_daily_health_task.ps1 -At 09:00
+# Without administrator access; runs only while this user is signed in:
+.\install_daily_health_task.ps1 -At 09:00 -CurrentUser
 ```
 
 Each successful check writes a timestamped JSON archive and atomically replaces
@@ -19,7 +21,10 @@ The report exposes scanner age, last successful collection, changed-response age
 resolved coin coverage, repeated/stale responses, failures and polling gaps.
 Archives are retained locally; no automatic deletion or external notification is
 configured. The task runs as Local Service with three retries, daily at 09:00 in
-the Windows local timezone. On this installation, `GMT Standard Time` follows
+the Windows local timezone (or as the signed-in user with `-CurrentUser`). The live
+installation uses the current-user option after the administrator prompt was
+canceled; it does not run while that user is signed out. On this installation,
+`GMT Standard Time` follows
 Dublin's seasonal clock changes. Confirm the host timezone when installing elsewhere.
 
 Operational review: inspect collection health daily and review the initial week
