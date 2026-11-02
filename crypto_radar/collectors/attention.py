@@ -51,6 +51,7 @@ class AttentionSettings(ProviderSettings):
 
 
 class ApeSettings(AttentionSettings):
+    asset_map_limit = 100
     poll_seconds: int = Field(default=1800, ge=60)
 
 
