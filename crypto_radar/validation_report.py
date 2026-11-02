@@ -152,7 +152,12 @@ def diagnostic(db, evaluation):
     threshold = cfg.get('ai', {}).get('min_pre_score')
     points = db.execute('SELECT ts,source_updated_ts FROM market_observations WHERE coin_id=? AND ts<=? ORDER BY ts DESC LIMIT 2',
                         (evaluation['coin_id'], evaluation['market_ts'])).fetchall()
+    original = db.execute('SELECT features_json FROM candidate_evaluations WHERE id=?', (evaluation.get('v11_evaluation_id'),)).fetchone()
+    captured = (json.loads(original[0]).get('observation_timing', {}) if original and original[0] else {})
+    computed = captured.get('candidate_computed_ts')
     return dict(evaluation_id=evaluation['id'], detected_ts=evaluation['detected_ts'],
+        candidate_computed_ts=computed,
+        market_to_computed_seconds=(dt(computed)-dt(evaluation['market_ts'])).total_seconds() if computed else None,
         market_ts=evaluation['market_ts'], decision=evaluation['decision'], reason=evaluation['reason'],
         score=evaluation['pre_score'], threshold=threshold,
         threshold_shortfall=max(0, threshold-evaluation['pre_score']) if threshold is not None and evaluation['pre_score'] is not None else None,
