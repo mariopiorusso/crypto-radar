@@ -43,12 +43,14 @@ destination configuration remain fixed; mail content cannot supply arbitrary
 commands, paths or upload destinations.
 
 The reusable weekly installer adds `--zip-volumes` for Drive jobs and allows eight
-hours instead of one. It preserves its existing Local Service security model;
-applying that change to an existing task requires Windows administrator access.
+hours instead of one. Its default Local Service mode requires administrator access.
+Use `-CurrentUser` for the explicitly approved signed-in-user mode; that job only
+runs while the user is signed in. The live task was changed to this mode after
+specific user approval, retaining its Monday 18:00 schedule.
 Existing scheduled `--drive --analysis` commands automatically use ZIP volumes and
 Deflate through the updated worker, without changing the task's account or settings.
-The currently installed task must be verified separately before claiming it has
-been updated. No account changes are made by the archive implementation.
+The installed task was read back to verify the account, eight-hour limit, arguments
+and next run. No account changes are made by the archive implementation itself.
 
 Local source archives, volumes and upload-state JSON are retained for recovery.
 No existing Drive files are deleted. Explicit `--notify` retains the established
