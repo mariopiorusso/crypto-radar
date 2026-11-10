@@ -45,6 +45,8 @@ commands, paths or upload destinations.
 The reusable weekly installer adds `--zip-volumes` for Drive jobs and allows eight
 hours instead of one. It preserves its existing Local Service security model;
 applying that change to an existing task requires Windows administrator access.
+Existing scheduled `--drive --analysis` commands automatically use ZIP volumes and
+Deflate through the updated worker, without changing the task's account or settings.
 The currently installed task must be verified separately before claiming it has
 been updated. No account changes are made by the archive implementation.
 

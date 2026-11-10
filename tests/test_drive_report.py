@@ -124,6 +124,15 @@ class DriveReportTests(unittest.TestCase):
         self.assertEqual(state['archive_format'],'zip-volumes-v1')
         self.client.upload.assert_not_called()
 
+    def test_existing_analysis_task_arguments_enable_zip_volumes(self):
+        from crypto_radar.weekly_report import main
+        with patch('sys.argv',['weekly_report','--drive','--analysis']), \
+             patch('crypto_radar.weekly_report.load_dotenv'), \
+             patch('crypto_radar.weekly_report.setup_logging'), \
+             patch('crypto_radar.drive_report.run_drive_report',return_value=Path('summary.zip')) as run:
+            main()
+        self.assertTrue(run.call_args.kwargs['zip_volumes'])
+
     def test_analysis_job_splits_and_notifies_once(self):
         remotes = {}
         self.client.generate_id.side_effect = ['one', 'two']

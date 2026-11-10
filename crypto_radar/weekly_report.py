@@ -129,7 +129,8 @@ def main():
         if args.drive:
             from .drive_report import run_drive_report
             archive = run_drive_report(dry_run=args.dry_run, notify=args.notify,
-                                       analysis=args.analysis, history_days=args.history_days,zip_volumes=args.zip_volumes)
+                                       analysis=args.analysis, history_days=args.history_days,
+                                       zip_volumes=args.zip_volumes or args.analysis)
             log.info("Drive report %s: %s", "prepared" if args.dry_run else "uploaded and verified", archive.name)
         else:
             run_report(dry_run=args.dry_run)
