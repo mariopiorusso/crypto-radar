@@ -7,7 +7,7 @@ if (-not $reportPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Admi
     throw 'Run as administrator to install the weekly report task.'
 }
 $reportArguments = '-B -m crypto_radar.weekly_report'
-if ($Drive) { $reportArguments += ' --drive' }
+if ($Drive) { $reportArguments += ' --drive --zip-volumes' }
 if ($Analysis) {
     if (-not $Drive) { throw '-Analysis requires -Drive' }
     $reportArguments += ' --analysis --history-days 84'
@@ -21,7 +21,7 @@ $reportAction = New-ScheduledTaskAction -Execute (Join-Path $reportRoot '.venv\S
 $reportTrigger = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Monday -At $At
 $reportSettings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable `
     -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 5) `
-    -ExecutionTimeLimit (New-TimeSpan -Hours 1) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+    -ExecutionTimeLimit (New-TimeSpan -Hours 8) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 $reportAccount = New-ScheduledTaskPrincipal -UserId 'S-1-5-19' -LogonType ServiceAccount -RunLevel Limited
 $reportName = 'Crypto Radar - Weekly Files'
 Register-ScheduledTask -TaskName $reportName -Action $reportAction -Trigger $reportTrigger `

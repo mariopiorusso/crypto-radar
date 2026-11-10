@@ -115,9 +115,12 @@ def main():
     parser.add_argument("--notify", action="store_true", help="Email confirmation after a verified Drive upload")
     parser.add_argument("--analysis", action="store_true", help="Upload compact analysis SQLite ZIP (requires --drive)")
     parser.add_argument("--history-days", type=int, default=84)
+    parser.add_argument('--zip-volumes', action='store_true',help='Upload multiple valid ZIP volumes below 200 MB (requires --drive)')
     args = parser.parse_args()
     if args.analysis and not args.drive:
         parser.error('--analysis requires --drive')
+    if args.zip_volumes and not args.drive:
+        parser.error('--zip-volumes requires --drive')
     if args.history_days < 1:
         parser.error('--history-days must be positive')
     load_dotenv(ROOT / ".env")
@@ -126,7 +129,7 @@ def main():
         if args.drive:
             from .drive_report import run_drive_report
             archive = run_drive_report(dry_run=args.dry_run, notify=args.notify,
-                                       analysis=args.analysis, history_days=args.history_days)
+                                       analysis=args.analysis, history_days=args.history_days,zip_volumes=args.zip_volumes)
             log.info("Drive report %s: %s", "prepared" if args.dry_run else "uploaded and verified", archive.name)
         else:
             run_report(dry_run=args.dry_run)
