@@ -18,7 +18,7 @@ def run(cfg,task,facts):
     command=[str(Path(cfg['repository'])/'.venv/Scripts/python.exe'),'-B',str(Path(__file__).resolve()),key]
     try:
         result=subprocess.run(command,cwd=cfg['repository'],capture_output=True,text=True,
-                              timeout=1200,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+                              timeout=28800,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
         data=json.loads(result.stdout)
         if result.returncode or not data.get('success'):
             raise RuntimeError(data.get('error','Snapshot failed'))
@@ -33,6 +33,7 @@ def run(cfg,task,facts):
 def create_snapshot(root,key):
     from crypto_radar.weekly_report import build_archive, save_state
     from crypto_radar.drive_report import DriveClient, checksums
+    from crypto_radar.snapshot_volumes import upload_volumes
     from crypto_radar.operational import process_lock
     directory=root/'orchestration_worker'/'snapshots'/key
     directory.mkdir(parents=True,exist_ok=True)
@@ -46,23 +47,18 @@ def create_snapshot(root,key):
                 sha,md5=checksums(path)
                 state=dict(filename=path.name,timestamp=stamp,local_zip_path=str(path),size=path.stat().st_size,
                            sha256=sha,md5=md5,integrity='SQLite backup API and PRAGMA quick_check: ok',
-                           folder=client.folder,account=client.account,file_id=client.generate_id(),status='ready')
+                           folder=client.folder,account=client.account,file_id=None,status='ready')
                 save_state(state_path,state)
             path=directory/state['filename']
             if path.parent!=directory or state['folder']!=client.folder or state['account']!=client.account:
                 raise ValueError('Snapshot destination mismatch')
             if checksums(path)!=(state['sha256'],state['md5']):
                 raise ValueError('Snapshot checksum mismatch')
-            remote=client.existing(state['file_id'])
-            if remote is None:
-                remote=client.upload(state['file_id'],path,state['sha256'])
-            if (remote.get('trashed') or remote.get('id')!=state['file_id']
-                or remote.get('md5Checksum')!=state['md5'] or int(remote.get('size',-1))!=state['size']
-                or remote.get('name')!=path.name or client.folder not in remote.get('parents',[])
-                or remote.get('mimeType')!='application/zip'):
-                raise ValueError('Drive verification failed')
-            state.update(success=True,status='uploaded',drive_url=remote.get('webViewLink') or 'https://drive.google.com/file/d/'+state['file_id']+'/view',
-                         tooling='weekly_report.build_archive; drive_report.DriveClient')
+            volumes=upload_volumes(client,path,directory/'volumes.json')
+            state.pop('drive_url',None)
+            state.update(success=True,status='uploaded',archive_format='zip-volumes-v1',
+                         parts=volumes['parts'],restore='Extract all volumes together; run python restore_snapshot.py',
+                         tooling='weekly_report.build_archive; snapshot_volumes.upload_volumes')
             save_state(state_path,state)
             return state
 

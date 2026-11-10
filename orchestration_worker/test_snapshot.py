@@ -30,22 +30,25 @@ class SnapshotTests(unittest.TestCase):
             with patch('crypto_radar.drive_report.DriveClient') as client_type, patch('socket.socket.connect',side_effect=AssertionError('offline')):
                 client=client_type.return_value.__enter__.return_value
                 client.folder='folder'; client.account='test@example.invalid'
-                client.generate_id.return_value='file123'
-                client.existing.return_value=None
+                client.generate_id.side_effect=['volume1','volume2']
+                remotes={}
+                client.existing.side_effect=lambda key:remotes.get(key)
                 def upload(file_id,path,sha):
                     remote=dict(id=file_id,name=path.name,md5Checksum=checksums(path)[1],size=path.stat().st_size,
                                 parents=['folder'],mimeType='application/zip')
-                    client.existing.return_value=remote
+                    remotes[file_id]=remote
                     return remote
                 client.upload.side_effect=upload
                 first=action.create_snapshot(root,'a'*64)
                 second=action.create_snapshot(root,'a'*64)
                 self.assertEqual(first,second)
-                client.upload.assert_called_once()
+                self.assertEqual(client.upload.call_count,2)
+                self.assertEqual(len(first['parts']),2)
+                self.assertTrue(all(p['filename'].endswith('.zip') for p in first['parts']))
                 self.assertTrue(first['success'])
                 with zipfile.ZipFile(first['local_zip_path']) as z:
                     self.assertEqual(set(z.namelist()),{'data/crypto_radar.db','config.yaml','crypto_radar/intelligence/statistical.py'})
                 self.assertEqual(before,(root/'data/crypto_radar.db').read_bytes())
-                client.existing.return_value=dict(id='wrong')
+                remotes[first['parts'][0]['file_id']]=dict(id='wrong')
                 with self.assertRaisesRegex(ValueError,'verification'):
                     action.create_snapshot(root,'a'*64)

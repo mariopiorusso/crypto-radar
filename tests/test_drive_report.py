@@ -7,11 +7,44 @@ from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from crypto_radar.drive_report import DriveClient, checksums, run_drive_report
+from crypto_radar.drive_report import DriveClient, checksums, run_drive_report, upload_parts
 from crypto_radar.weekly_report import MEMBERS
 
 
 class DriveReportTests(unittest.TestCase):
+    def test_parts_reassemble_and_recover_after_lost_upload_response(self):
+        path = self.root / 'analysis.zip'
+        payload = bytes(range(251)) * 5
+        path.write_bytes(payload)
+        state_path = self.root / 'parts.json'
+        remotes = {}
+        self.client.generate_id.side_effect = ['part-1', 'part-2']
+        self.client.existing.side_effect = lambda key: remotes.get(key)
+        def upload(key, part, sha):
+            remotes[key] = dict(id=key, name=part.name, parents=['folder-id'],
+                mimeType='application/octet-stream', size=str(part.stat().st_size),
+                md5Checksum=checksums(part)[1])
+            if len(remotes) == 1:
+                raise TimeoutError('Response lost')
+            return remotes[key]
+        self.client.upload.side_effect = upload
+        with patch('crypto_radar.drive_report.MAX_PART_BYTES', 700):
+            with self.assertRaises(TimeoutError):
+                upload_parts(self.client, path, state_path)
+            # Drive may identify the first chunk from its ZIP signature.
+            remotes['part-1']['mimeType'] = 'application/x-zip'
+            state = upload_parts(self.client, path, state_path)
+            upload_parts(self.client, path, state_path)
+        parts = sorted(self.root.glob('*.part*'))
+        self.assertEqual([p.stat().st_size for p in parts], [700, 555])
+        self.assertEqual(b''.join(p.read_bytes() for p in parts), payload)
+        self.assertEqual(state['status'], 'uploaded')
+        self.assertEqual(self.client.upload.call_count, 2)
+        remotes['part-1']['md5Checksum'] = 'wrong'
+        with patch('crypto_radar.drive_report.MAX_PART_BYTES', 700):
+            with self.assertRaisesRegex(ValueError, 'verification'):
+                upload_parts(self.client, path, state_path)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -76,6 +109,54 @@ class DriveReportTests(unittest.TestCase):
              patch('crypto_radar.drive_report.send_alert') as mail:
             self.assertEqual(run_drive_report(self.root,analysis=True,dry_run=True,notify=True),path)
             drive.assert_not_called();mail.assert_not_called()
+
+    def test_zip_volume_job_uploads_and_notifies_once(self):
+        parts={'parts':[{'filename':'one.zip','file_id':'one','web_view_link':'https://drive.google.com/one'},
+                        {'filename':'two.zip','file_id':'two','web_view_link':'https://drive.google.com/two'}]}
+        with patch('crypto_radar.snapshot_volumes.upload_volumes',return_value=parts) as volumes, \
+             patch('crypto_radar.drive_report.send_alert') as mail:
+            path=run_drive_report(self.root,now=self.now,zip_volumes=True,notify=True)
+            self.assertEqual(run_drive_report(self.root,now=self.now,zip_volumes=True,notify=True),path)
+            self.assertEqual(volumes.call_count,2)
+            mail.assert_called_once()
+            self.assertIn('restore_snapshot.py',mail.call_args.args[0])
+        state=json.loads(next(path.parent.glob('*.drive.json')).read_text())
+        self.assertEqual(state['archive_format'],'zip-volumes-v1')
+        self.client.upload.assert_not_called()
+
+    def test_existing_analysis_task_arguments_enable_zip_volumes(self):
+        from crypto_radar.weekly_report import main
+        with patch('sys.argv',['weekly_report','--drive','--analysis']), \
+             patch('crypto_radar.weekly_report.load_dotenv'), \
+             patch('crypto_radar.weekly_report.setup_logging'), \
+             patch('crypto_radar.drive_report.run_drive_report',return_value=Path('summary.zip')) as run:
+            main()
+        self.assertTrue(run.call_args.kwargs['zip_volumes'])
+
+    def test_analysis_job_splits_and_notifies_once(self):
+        remotes = {}
+        self.client.generate_id.side_effect = ['one', 'two']
+        self.client.existing.side_effect = lambda key: remotes.get(key)
+        def upload(key, part, sha):
+            remotes[key] = dict(id=key, name=part.name, parents=['folder-id'],
+                mimeType='application/octet-stream', size=str(part.stat().st_size),
+                md5Checksum=checksums(part)[1])
+            return remotes[key]
+        self.client.upload.side_effect = upload
+        def export(source, destination, **kwargs):
+            path = destination.with_suffix('.zip')
+            path.write_bytes(b'abcdefghij')
+            return {'zip_path': str(path)}
+        with patch('crypto_radar.analysis_snapshot.export_snapshot', side_effect=export) as exporter, \
+             patch('crypto_radar.drive_report.MAX_PART_BYTES', 6), \
+             patch('crypto_radar.drive_report.send_alert') as mail:
+            path = run_drive_report(self.root, now=self.now, analysis=True, notify=True)
+            run_drive_report(self.root, now=self.now, analysis=True, notify=True)
+        exporter.assert_called_once()
+        mail.assert_called_once()
+        self.assertIn('2 parts', mail.call_args.args[0])
+        self.assertEqual(self.client.upload.call_count, 2)
+        self.assertEqual(b''.join(p.read_bytes() for p in sorted(path.parent.glob('*.zip.part[0-9][0-9][0-9]'))), b'abcdefghij')
 
     def test_response_loss_recovers_reserved_id(self):
         original = self.client.upload.side_effect
