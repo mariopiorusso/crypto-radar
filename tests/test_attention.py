@@ -77,6 +77,26 @@ class AttentionTests(unittest.TestCase):
         self.assertFalse(features(self.db,'example',(later+timedelta(hours=1)).isoformat())['apewisdom_observed'])
         self.assertFalse(features(self.db,'example',(NOW-timedelta(seconds=1)).isoformat())['apewisdom_observed'])
 
+    def test_ape_negative_net_votes_are_preserved(self):
+        for value in (-8, '-8', -2**63):
+            with self.subTest(value=value):
+                data=fixture('apewisdom.json')
+                data['results'][0]['upvotes']=value
+                self.ape(payload=data)
+                row=self.db.execute("SELECT upvotes FROM apewisdom_snapshots WHERE ticker='EX' ORDER BY rowid DESC LIMIT 1").fetchone()
+                self.assertEqual(row[0],int(value))
+
+    def test_ape_invalid_counts_fail_without_partial_snapshots(self):
+        for field,value in (('mentions',-1),('rank',-1),('mentions_24h_ago',-1),
+                            ('rank_24h_ago',-1),('upvotes',True),('upvotes',1.5),
+                            ('upvotes',-2**63-1),('upvotes',2**63)):
+            with self.subTest(field=field,value=value):
+                data=fixture('apewisdom.json'); data['results'][1][field]=value
+                with self.assertRaises(ValueError): self.ape(payload=data)
+                row=self.db.execute('SELECT status,error FROM attention_runs ORDER BY rowid DESC LIMIT 1').fetchone()
+                self.assertEqual(tuple(row),('failed','ValueError'))
+        self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+
     def test_explicit_asset_resolution_rejects_ambiguity(self):
         self.assertEqual(resolve(ASSETS,{'other':'EX'}),{})
         with self.assertRaises(ValueError):

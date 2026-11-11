@@ -22,12 +22,12 @@ def stamp(value):
     return result.astimezone(timezone.utc)
 
 
-def integer(value):
+def integer(value, *, signed=False):
     if value is None:
         return None
-    if isinstance(value, str) and re.fullmatch(r'\d+', value):
+    if isinstance(value, str) and re.fullmatch(r'-?\d+' if signed else r'\d+', value):
         value = int(value)
-    if type(value) is not int or not 0 <= value <= 2**63-1:
+    if type(value) is not int or not (-2**63 if signed else 0) <= value <= 2**63-1:
         raise ValueError('Invalid provider count')
     return value
 
@@ -208,7 +208,9 @@ class ApeWisdomCollector(NativeCollector):
                     if not isinstance(ticker,str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,100}',ticker):
                         raise ProviderError('malformed')
                     ticker=ticker.upper()
-                    values = [integer(item.get(k)) for k in ('mentions','upvotes','rank','mentions_24h_ago','rank_24h_ago')]
+                    # Net votes can be negative; mentions and ranks cannot.
+                    values = [integer(item.get(k), signed=k == 'upvotes')
+                              for k in ('mentions','upvotes','rank','mentions_24h_ago','rank_24h_ago')]
                     if ticker in rows:
                         raise ProviderError('malformed')
                     rows[ticker]=values
@@ -226,9 +228,11 @@ class ApeWisdomCollector(NativeCollector):
                 (receipt.isoformat(),state,int(complete),pages,len(rows),fingerprint,key))
             conn.commit()
             return state,len(rows)
-        except Exception:
+        except Exception as exc:
             conn.rollback()
-            conn.execute("UPDATE attention_runs SET status='failed',pages=? WHERE id=?",(pages,key))
+            # Store a bounded category, never exception bodies or request secrets.
+            reason = exc.status if isinstance(exc, ProviderError) else type(exc).__name__
+            conn.execute("UPDATE attention_runs SET status='failed',pages=?,error=? WHERE id=?",(pages,reason,key))
             conn.commit()
             raise
 
