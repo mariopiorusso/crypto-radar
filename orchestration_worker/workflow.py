@@ -86,7 +86,10 @@ def parse(text):
                         for line in clean.splitlines()]
         # Sentence punctuation, semicolons, newlines and list markers are layout,
         # not authorization. Keep comma clauses together to preserve negations.
-        clauses = re.split(r'[;\n]+|[.!?](?=\s|$)', '\n'.join(sections))
+        # Mail clients wrap comma-separated instructions across physical lines.
+        # Keep the whole instruction, including any negation/condition, together.
+        instructions=re.sub(r',[ \t]*\n[ \t]*', ', ', '\n'.join(sections))
+        clauses = re.split(r'[;\n]+|[.!?](?=\s|$)', instructions)
         for clause in clauses:
             clause = clause.strip()
             actions = set()

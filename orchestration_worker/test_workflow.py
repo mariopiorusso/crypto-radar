@@ -3,6 +3,18 @@ from workflow import normalize, plan, WorkflowError
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_wrapped_real_email_delivery_instruction(self):
+        request=('Subject: [CRADAR TASK] README-DOCS-20261111\n\n'
+                 'Review the Crypto Radar README for outdated or conflicting instructions.\n\n'
+                 'Create a worker branch from current main, fix the documentation,\n'
+                 'check the diff, commit and push, and open a PR.\n\n'
+                 'Do not merge or change the running scanner.\nReply with what changed and the PR link.')
+        result=plan(normalize(request))
+        self.assertTrue(result['publish']); self.assertTrue(result['create_pr'])
+        for lead in ('Do not', 'If approved,'):
+            result=plan(normalize(lead+' commit,\npush and open a PR.'))
+            self.assertFalse(result['publish']); self.assertFalse(result['create_pr'])
+
     def test_plain_email_needs_no_magic_fields(self):
         text='Fix the parser. Run tests. Commit and push. Open a PR. Do not merge.'
         self.assertEqual(plan(normalize(text)),dict(publish=True,create_pr=True,post_comment=False,issue_number=None))
