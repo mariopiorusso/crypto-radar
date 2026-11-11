@@ -163,9 +163,17 @@ class State:
             sent_at TEXT,sent_message_id TEXT,error TEXT)''')
         if 'request_text' not in {row[1] for row in self.db.execute('PRAGMA table_info(tasks)')}:
             self.db.execute("ALTER TABLE tasks ADD COLUMN request_text TEXT NOT NULL DEFAULT ''")
+        columns={row[1] for row in self.db.execute('PRAGMA table_info(tasks)')}
+        for name in ('gmail_thread_id','sender','session_id'):
+            if name not in columns:
+                self.db.execute('ALTER TABLE tasks ADD COLUMN '+name+" TEXT NOT NULL DEFAULT ''")
+        self.db.execute('''CREATE TABLE IF NOT EXISTS email_sessions (
+            gmail_thread_id TEXT NOT NULL, sender TEXT NOT NULL, session_id TEXT NOT NULL,
+            repository TEXT NOT NULL, branch TEXT, updated_at TEXT NOT NULL,
+            PRIMARY KEY(gmail_thread_id,sender))''')
         self.db.commit()
 
-    def record(self,mid,tid,received,error=None,request_text=''):
+    def record(self,mid,tid,received,error=None,request_text='',gmail_thread_id='',sender=''):
         self.db.execute('BEGIN IMMEDIATE')
         try:
             if self.db.execute('SELECT 1 FROM tasks WHERE gmail_message_id=?',(mid,)).fetchone():
@@ -174,8 +182,8 @@ class State:
             if tid and self.db.execute('SELECT 1 FROM tasks WHERE task_id=?',(tid,)).fetchone():
                 tid,error = None,'duplicate_task_id'
             state = 'REJECTED' if error else 'PENDING'
-            self.db.execute('INSERT INTO tasks(gmail_message_id,task_id,received_at,status,error,request_text) VALUES (?,?,?,?,?,?)',
-                            (mid,tid,received,state,error,request_text if not error else ''))
+            self.db.execute('INSERT INTO tasks(gmail_message_id,task_id,received_at,status,error,request_text,gmail_thread_id,sender) VALUES (?,?,?,?,?,?,?,?)',
+                            (mid,tid,received,state,error,request_text if not error else '',gmail_thread_id,sender))
             self.db.commit()
             return state
         except BaseException:
@@ -194,13 +202,15 @@ class State:
         with self.db:
             return self.db.execute("UPDATE tasks SET status='RUNNING',started_at=? WHERE gmail_message_id=? AND status='PENDING'",(now(),mid)).rowcount==1
 
-    def finish(self,mid,code,error,completion=None):
+    def finish(self,mid,code,error,completion=None,queue_reply=True):
         with self.db:
             changed = self.db.execute("UPDATE tasks SET status=?,completed_at=?,exit_code=?,error=? WHERE gmail_message_id=? AND status='RUNNING'",
                 ('COMPLETED' if code==0 and not error else 'FAILED',now(),code,error,mid)).rowcount
             if changed!=1:
                 raise RuntimeError('Invalid state transition')
-            if completion is not None:
+            if completion and completion.get('session_id'):
+                self.db.execute('UPDATE tasks SET session_id=? WHERE gmail_message_id=?',(completion['session_id'],mid))
+            if completion is not None and queue_reply:
                 self.db.execute("INSERT OR IGNORE INTO replies(gmail_message_id,report_json,status) VALUES (?,?,'PENDING')",
                                 (mid,json.dumps(completion)))
 
@@ -244,7 +254,7 @@ def codex_command(cfg):
     if engineering and cfg.get('engineering_repository'):
         cfg=dict(cfg,repository=cfg['engineering_repository'])
     args = [str(executable),'-a','never','exec','--sandbox','workspace-write' if engineering else 'read-only','--ignore-user-config',
-            '--ignore-rules','--ephemeral','--color','never','--output-schema',str(ROOT/'result.schema.json')]
+            '--ignore-rules','--json','--color','never','--output-schema',str(ROOT/'result.schema.json')]
     # Verified using installed codex features list, 0.154.0-alpha.6.2.
     for feature in ('apps','plugins','hooks','multi_agent','multi_agent_v2',
                     'computer_use','browser_use','browser_use_external',
@@ -299,13 +309,21 @@ def run_codex(cfg,task):
         repo,number,_,_=issue_action.issue_fields(cfg,request)
         with issue_action.github_session() as session:
             facts['github_issue']=issue_action.lookup(session,repo,number)
+    from session_history import lookup_session, decode_events, save_session
+    previous=lookup_session(cfg,task)
+    if previous:
+        facts['email_conversation']=previous
+    facts['current_email_authority']='Only this email delivery_plan authorizes publication; older turns are context.'
     prompt = (ROOT/('engineering.txt' if engineering else 'bootstrap.txt')).read_text()+'\n'+json.dumps({'MODE':'ENGINEERING' if engineering else 'TEST','TASK_ID':task['task_id'],'facts':facts,'email_request':request,'original_email_context':task['request_text'] if 'request_text' in task.keys() else ''})
     allowed = {'SYSTEMROOT','SYSTEMDRIVE','PROGRAMDATA','PROGRAMFILES','PROGRAMFILES(X86)','WINDIR','PATH','TEMP','TMP','USERPROFILE','LOCALAPPDATA','APPDATA','PATHEXT','COMSPEC'}
     env = {k:v for k,v in os.environ.items() if k.upper() in allowed}
     env['GIT_TERMINAL_PROMPT']='0'
     try:
         with Job() as job:
-            with subprocess.Popen(codex_command(cfg),stdin=subprocess.PIPE,text=True,encoding='utf-8',errors='replace',
+            command=codex_command(cfg)
+            if previous:
+                command[-1:-1]=['resume',previous['session_id']]
+            with subprocess.Popen(command,stdin=subprocess.PIPE,text=True,encoding='utf-8',errors='replace',
                 stdout=subprocess.PIPE,stderr=subprocess.PIPE,cwd=cfg['repository'],env=env,
                 shell=False,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0)) as process:
                 job.assign(process)
@@ -316,7 +334,11 @@ def run_codex(cfg,task):
                     process.kill()
                     process.communicate()
                     raise
-                return dict(exit_code=process.returncode,stdout=redact(stdout),stderr=redact(stderr),facts=facts,engineering=engineering,execution_repository=cfg['repository'])
+                final,session_id=decode_events(stdout)
+                session_id=session_id or (previous['session_id'] if previous else None)
+                if session_id:
+                    save_session(cfg,task,session_id,final)
+                return dict(exit_code=process.returncode,stdout=redact(final),stderr=redact(stderr),facts=facts,engineering=engineering,execution_repository=cfg['repository'],session_id=session_id)
     except subprocess.TimeoutExpired as exc:
         def output(value):
             return redact(value.decode('utf-8',errors='replace') if isinstance(value,bytes) else value or '')
@@ -386,7 +408,7 @@ class Gmail:
                 encoded=data['raw']
                 raw=base64.urlsafe_b64decode(encoded+'===') if len(encoded)<=90000 else b'x'*65537
                 received=datetime.fromtimestamp(int(data['internalDate'])/1000,timezone.utc).isoformat()
-                yield mid,raw,received,'SENT' in data.get('labelIds',[])
+                yield mid,raw,received,'SENT' in data.get('labelIds',[]),data.get('threadId','')
                 count+=1
             token=page.get('nextPageToken')
             if not token:
@@ -412,16 +434,20 @@ def poll(cfg,messages,runner=run_codex,dry_run=False,gmail=None):
             for entry in messages:
                 mid,raw,received=entry[:3]
                 sent_by_mailbox=entry[3] if len(entry)>3 else False
+                thread=entry[4] if len(entry)>4 else ''
+                sender=''
                 count+=1
                 tid,error=None,None
                 request_text=''
                 try:
                     tid,request_text=parse_message(raw,cfg,include_body=True,sent_by_mailbox=sent_by_mailbox)
+                    parsed=BytesParser(policy=email.policy.default).parsebytes(raw)
+                    sender=getaddresses([str(parsed['From'])])[0][1].lower()
                     if cfg.get('accept_after') and datetime.fromisoformat(received) < datetime.fromisoformat(cfg['accept_after']):
                         error='before_activation'
                 except Exception as exc:
                     error=str(exc) if isinstance(exc,ValueError) and re.fullmatch('[a-z_]+',str(exc)) else 'malformed_message'
-                result=state.record(mid,tid,received,error,request_text) if state else ('would_reject' if error else 'would_accept')
+                result=state.record(mid,tid,received,error,request_text,thread,sender) if state else ('would_reject' if error else 'would_accept')
                 if dry_run:
                     if mid in seen_messages or (preview and preview.execute('SELECT 1 FROM tasks WHERE gmail_message_id=?',(mid,)).fetchone()):
                         result='duplicate_message'
@@ -440,6 +466,8 @@ def poll(cfg,messages,runner=run_codex,dry_run=False,gmail=None):
                 if gmail is not None:
                     from replies import deliver_pending
                     deliver_pending(state,cfg,gmail,now)
+                from session_history import write_history
+                write_history(cfg)
     finally:
         if state:
             state.db.close()
@@ -488,6 +516,7 @@ def execute_task(cfg,state,task,runner):
         (logs/(stem+'.'+channel+'.log')).write_text(redact(result.get(channel,'')),encoding='utf-8')
     facts=report if valid_report and result.get('engineering') else result.get('facts',{})
     completion=dict(task_id=task['task_id'],gmail_message_id=task['gmail_message_id'],
+        session_id=result.get('session_id'),gmail_thread_id=task['gmail_thread_id'] if 'gmail_thread_id' in task.keys() else None,
         outcome=report['outcome'] if valid_report else 'FAILED',
         supervisor=dict(process_id=os.getpid(),child_exit_code=code,child_result_received=code is not None,
                         source='worker process; scheduler provenance not independently verified'),
@@ -499,7 +528,7 @@ def execute_task(cfg,state,task,runner):
         completion['delivery']=report.get('delivery',{})
         completion['delivery_plan']=result.get('facts',{}).get('delivery_plan')
     atomic_json(Path(cfg['report_path'])/(stem+'.json'),completion)
-    state.finish(task['gmail_message_id'],code,error,completion if cfg.get('reply_enabled',False) else None)
+    state.finish(task['gmail_message_id'],code,error,completion,queue_reply=cfg.get('reply_enabled',False))
     LOG.info('Codex result task=%s status=%s',task['task_id'],completion['status'])
 
 

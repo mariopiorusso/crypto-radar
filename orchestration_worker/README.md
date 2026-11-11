@@ -458,8 +458,9 @@ Send plain-text mail to `cryptoradar128@gmail.com`, from a configured trusted
 sender, with `[CRADAR TASK]` in the subject. Put the request in the body. No
 `TASK_TYPE` or `MODE` is required. For example: "Fix the parser, run tests,
 commit and push. Open a PR. Do not merge." Explicit YES/NO fields still work.
-Replies arrive in the original email thread. Include relevant context when
-following up: each request starts a fresh agent, separate from the IDE chat.
+Replies arrive in the original email thread. New conversations start a saved
+Codex session; replies in the same Gmail thread from the same trusted sender
+resume that session. These sessions are separate from the IDE chat.
 
 The launcher discovers the newest installed Codex VS Code extension if its
 configured versioned executable disappears. Authentication stays in the existing
@@ -472,3 +473,23 @@ activation boundary are rejected without execution, preserving old task history.
 Completed or failed tasks are never replayed automatically. The restored live
 configuration sets a new boundary on activation. Changes run in the independent
 engineering checkout; they are not automatically merged or deployed to the scanner.
+
+## Persistent conversation history
+
+The additive `email_sessions` table maps the Gmail thread, authenticated sender,
+and repository to a Codex session ID. A different sender or repository never
+inherits another conversation. The CLI runs without `--ephemeral`; JSON events
+identify the session and final answer. Follow-ups use `exec resume` with that
+exact ID, never the most recent unrelated session. This email's delivery plan
+remains the authority for publishing, even if an earlier turn requested a push.
+
+Replies and per-task reports include `session_id` and `gmail_thread_id`.
+Open `reports/history.md` for prompts, results, status, and `codex resume` commands;
+`reports/history.json` supplies the same index for future tools. These are local,
+ignored runtime files. Normal Codex transcripts remain in the user's Codex session
+store. The worker history does not depend on sidebar discovery. External Codex
+sessions can be included in the Agents list's application filters, but automatic
+discovery of this CLI's saved sessions must be verified in the installed host.
+
+Older ephemeral tasks retain their existing prompts and reports, but have no
+recoverable Codex session ID. They are not rerun to manufacture conversation history.

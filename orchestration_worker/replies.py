@@ -35,7 +35,7 @@ def build_reply(cfg,original,completion):
     message['Message-ID']=make_msgid(domain=cfg['mailbox'].split('@')[1])
     message['Date']=formatdate(localtime=False)
     message['Auto-Submitted']='auto-replied'
-    fields=('task_id','status','outcome','supervisor','repository_detected','repository','branch','head','test_status',
+    fields=('task_id','session_id','gmail_thread_id','status','outcome','supervisor','repository_detected','repository','branch','head','test_status',
             'github_access_status','implementation_outcome','delivery_plan','delivery',
             'started_at','completed_at','codex_exit_code','summary','error')
     report={key:completion.get(key) for key in fields}

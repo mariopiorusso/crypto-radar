@@ -41,6 +41,11 @@ plan. Implementation outcome and supervisor delivery are reported separately.
 Ordinary task emails do not require TASK_TYPE, MODE or special control fields.
 Use facts.delivery_plan directly, including instructions inferred from plain text.
 If no delivery was requested, complete local work or answer the question normally.
+Emails in the same thread resume this conversation. Earlier instructions and
+delivery permissions do not authorize new external actions: use this turn's
+facts.delivery_plan. For a follow-up, continue the earlier task branch recorded
+in facts.email_conversation.branch when safe; inspect status and preserve changes
+before switching. Do not silently edit a different task's branch.
 Do not label completed local work BLOCKED merely because publication was not requested.
 For new implementation work, create a unique worker/* branch from origin/main;
 preserve previous task branches and all existing changes. Do not use an old task's
