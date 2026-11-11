@@ -43,6 +43,10 @@ def config(path):
     if set(raw)-set(cfg):
         raise ValueError('Unknown configuration keys')
     cfg.update(raw)
+    if cfg['accept_after']:
+        cutoff=datetime.fromisoformat(cfg['accept_after'])
+        if cutoff.tzinfo is None:
+            raise ValueError('accept_after must include a timezone')
     if type(cfg['reply_enabled']) is not bool:
         raise ValueError('reply_enabled must be boolean')
     if type(cfg['engineering_enabled']) is not bool:
@@ -233,7 +237,7 @@ def redact(text):
 
 
 def codex_command(cfg):
-    executable = Path(cfg['codex_executable'])
+    executable = resolve_codex(cfg['codex_executable'])
     if not executable.is_file() or executable.name.lower()!='codex.exe':
         raise ValueError('Configured native codex.exe not found')
     engineering=cfg.get('engineering_enabled',False)
@@ -258,11 +262,25 @@ def codex_command(cfg):
     return args
 
 
+def resolve_codex(configured):
+    """Recover from VS Code replacing its versioned extension directory."""
+    executable = Path(configured)
+    if executable.is_file():
+        return executable
+    extensions = Path.home()/'.vscode/extensions'
+    candidates = list(extensions.glob('openai.chatgpt-*/bin/windows-x86_64/codex.exe'))
+    if candidates:
+        def version(path):
+            return tuple(int(n) for n in re.findall(r'\d+', path.parents[2].name))
+        return max(candidates, key=version)
+    raise ValueError('Configured native codex.exe not found; install the Codex extension')
+
+
 def run_codex(cfg,task):
     facts = repository_facts(cfg['repository'])
     request = task['request_text'] if 'request_text' in task.keys() else ''
     import issue_action
-    from github_delivery import normalize
+    from github_delivery import normalize, plan
     request=issue_action.review_request(cfg,normalize(request))
     if issue_action.requested(request):
         issue_facts=repository_facts(cfg.get('engineering_repository') or cfg['repository'])
@@ -274,11 +292,14 @@ def run_codex(cfg,task):
     if engineering and cfg.get('engineering_repository'):
         cfg=dict(cfg,repository=cfg['engineering_repository'])
         facts=repository_facts(cfg['repository'])
+    if engineering:
+        facts['delivery_plan']=plan(request)
+        LOG.info('GitHub delivery preflight task=%s plan=%s',task['task_id'],json.dumps(facts['delivery_plan'],sort_keys=True))
     if engineering and re.search(r'^POST_COMMENT:[ \t]*YES[ \t]*$',request,re.M):
         repo,number,_,_=issue_action.issue_fields(cfg,request)
         with issue_action.github_session() as session:
             facts['github_issue']=issue_action.lookup(session,repo,number)
-    prompt = (ROOT/('engineering.txt' if engineering else 'bootstrap.txt')).read_text()+'\n'+json.dumps({'MODE':'ENGINEERING' if engineering else 'TEST','TASK_ID':task['task_id'],'facts':facts,'email_request':request})
+    prompt = (ROOT/('engineering.txt' if engineering else 'bootstrap.txt')).read_text()+'\n'+json.dumps({'MODE':'ENGINEERING' if engineering else 'TEST','TASK_ID':task['task_id'],'facts':facts,'email_request':request,'original_email_context':task['request_text'] if 'request_text' in task.keys() else ''})
     allowed = {'SYSTEMROOT','SYSTEMDRIVE','PROGRAMDATA','PROGRAMFILES','PROGRAMFILES(X86)','WINDIR','PATH','TEMP','TMP','USERPROFILE','LOCALAPPDATA','APPDATA','PATHEXT','COMSPEC'}
     env = {k:v for k,v in os.environ.items() if k.upper() in allowed}
     env['GIT_TERMINAL_PROMPT']='0'
@@ -396,6 +417,8 @@ def poll(cfg,messages,runner=run_codex,dry_run=False,gmail=None):
                 request_text=''
                 try:
                     tid,request_text=parse_message(raw,cfg,include_body=True,sent_by_mailbox=sent_by_mailbox)
+                    if cfg.get('accept_after') and datetime.fromisoformat(received) < datetime.fromisoformat(cfg['accept_after']):
+                        error='before_activation'
                 except Exception as exc:
                     error=str(exc) if isinstance(exc,ValueError) and re.fullmatch('[a-z_]+',str(exc)) else 'malformed_message'
                 result=state.record(mid,tid,received,error,request_text) if state else ('would_reject' if error else 'would_accept')
@@ -448,13 +471,16 @@ def execute_task(cfg,state,task,runner):
             raise ValueError('Invalid report')
         if code==0:
             valid_report=True
-            if result.get('engineering') and report['outcome']=='COMPLETED':
+            if result.get('engineering') and report['outcome'] in ('COMPLETED','BLOCKED'):
                 from github_delivery import deliver
                 deliver(cfg,task,report)
             if report['outcome']!='COMPLETED':
                 error='task_'+report['outcome'].lower()
     except Exception as exc:
         error=type(exc).__name__
+        from workflow import WorkflowError
+        if isinstance(exc,WorkflowError):
+            result['failure_summary']='Workflow preflight stopped before Codex launch: '+str(exc)
     stem=hashlib.sha256(task['gmail_message_id'].encode()).hexdigest()
     logs=Path(cfg['log_path'])
     logs.mkdir(parents=True,exist_ok=True)
@@ -468,6 +494,10 @@ def execute_task(cfg,state,task,runner):
         status='COMPLETED' if code==0 and not error else 'FAILED',started_at=started,completed_at=now(),
         codex_exit_code=code,repository=result.get('execution_repository',cfg['repository']),**{k:facts.get(k) for k in ('repository_detected','branch','head','test_status','github_access_status')},
         summary=redact(report['summary']) if valid_report else result.get('failure_summary','Task failed; review sanitized logs'),error=error)
+    if valid_report and result.get('engineering'):
+        completion['implementation_outcome']=report.get('implementation_outcome',report['outcome'])
+        completion['delivery']=report.get('delivery',{})
+        completion['delivery_plan']=result.get('facts',{}).get('delivery_plan')
     atomic_json(Path(cfg['report_path'])/(stem+'.json'),completion)
     state.finish(task['gmail_message_id'],code,error,completion if cfg.get('reply_enabled',False) else None)
     LOG.info('Codex result task=%s status=%s',task['task_id'],completion['status'])

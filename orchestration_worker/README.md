@@ -419,3 +419,56 @@ inferred. Conflicting issue targets fail validation. Existing explicit
 remain available. Delivery runs in order: verified push, review PR, issue comment.
 PR creation has persistent at-most-once attempt tracking; ambiguous sends require
 inspection. Credentials remain in the supervisor. No automatic PR merge occurs.
+## GitHub workflow delivery
+
+Engineering emails may use `GITHUB`, `GITHUB WORKFLOW`, `GIT`, or `ROADMAP`
+sections. Plain or Markdown headings, numbered/bulleted lists, semicolons and
+sentences on the same line are supported. For example:
+
+```text
+TASK_TYPE=ENGINEERING
+PR_REQUIRED=true
+GITHUB WORKFLOW
+Commit/push. Open a PR. DO NOT MERGE. Add a status comment to GitHub issue #2.
+```
+
+`workflow.py` produces a single canonical delivery plan before Codex runs. The
+plan is logged and supplied to the agent. Conflicting fields, multiple issue
+targets, missing comment targets, and an unrecognized required PR fail preflight
+with a concrete explanation. Explicit YES/NO fields remain available; NO overrides
+inferred instructions. Conditional instructions, quoted replies and fenced examples
+do not confer authority. `PR_REQUIRED=true` validates the plan; it does not grant
+push permission on its own. Unsupported natural-language requests may still need
+clarification; no parser can promise to understand every possible email.
+
+Completed local work can be published and submitted as a PR. When implementation
+is blocked, the worker preserves that outcome and may still deliver an explicitly
+requested issue status comment; it does not push incomplete work or open its PR.
+Delivery uses the existing persistent deduplication records. Old failed emails
+are not automatically rerun. A push or PR delivery failure does not suppress an
+authorized status comment. Reports and reply emails show `implementation_outcome`
+and per-action `delivery` states/URLs separately, while preserving the existing
+overall outcome and task-state compatibility. Research prerequisites can still
+block implementation; a delivered status comment does not imply code completion.
+
+
+## Laptop email agent recovery (11 November 2026)
+
+Send plain-text mail to `cryptoradar128@gmail.com`, from a configured trusted
+sender, with `[CRADAR TASK]` in the subject. Put the request in the body. No
+`TASK_TYPE` or `MODE` is required. For example: "Fix the parser, run tests,
+commit and push. Open a PR. Do not merge." Explicit YES/NO fields still work.
+Replies arrive in the original email thread. Include relevant context when
+following up: each request starts a fresh agent, separate from the IDE chat.
+
+The launcher discovers the newest installed Codex VS Code extension if its
+configured versioned executable disappears. Authentication stays in the existing
+local Codex login. Engineering remains workspace-write with no interactive
+approval prompts; supervisor-owned GitHub delivery uses the existing Git login.
+The laptop must be awake, online and signed in. Polling is installed every minute.
+
+`accept_after` is an ISO timestamp with a timezone. Requests received before this
+activation boundary are rejected without execution, preserving old task history.
+Completed or failed tasks are never replayed automatically. The restored live
+configuration sets a new boundary on activation. Changes run in the independent
+engineering checkout; they are not automatically merged or deployed to the scanner.

@@ -16,6 +16,17 @@ from email import policy
 
 
 class WorkerTests(unittest.TestCase):
+    def test_codex_recovers_after_extension_update(self):
+        home=self.root/'home'
+        old=home/'.vscode/extensions/openai.chatgpt-26.9.1/bin/windows-x86_64/codex.exe'
+        new=home/'.vscode/extensions/openai.chatgpt-26.11.1/bin/windows-x86_64/codex.exe'
+        for executable in (old,new):
+            executable.parent.mkdir(parents=True)
+            executable.write_bytes(b'fixture')
+        with patch('gmail_poller.Path.home',return_value=home):
+            self.assertEqual(worker.resolve_codex(str(self.root/'missing/codex.exe')),new)
+            self.assertEqual(worker.resolve_codex(str(old)),old)
+
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -80,6 +91,13 @@ class WorkerTests(unittest.TestCase):
         run=Mock()
         worker.poll(self.cfg,[],run)
         run.assert_not_called()
+
+    def test_activation_cutoff_does_not_execute_old_mail(self):
+        self.cfg['accept_after']='2026-11-11T12:00:00+00:00'
+        run=Mock()
+        worker.poll(self.cfg,[('old',self.raw,'2026-10-01T12:00:00+00:00')],run)
+        run.assert_not_called()
+        self.assertEqual(self.rows()[0][2],'before_activation')
 
     def test_duplicate_message_and_task_only_one_execution(self):
         run=Mock(side_effect=self.fake)
@@ -407,6 +425,24 @@ class WorkerTests(unittest.TestCase):
             worker.run_codex(self.cfg,{'task_id':'TEST','request_text':'ACTION: SNAPSHOT'})
             self.assertEqual(snapshot.call_args.args[0]['repository'],str(self.repo))
 
+    def test_workflow_preflight_precedes_codex_and_supplies_plan(self):
+        self.cfg.update(engineering_enabled=True,publish_remote='https://github.com/example/repo')
+        Path(self.cfg['codex_executable']).write_bytes(b'fake')
+        request='TASK_TYPE=ENGINEERING\nPR_REQUIRED=true\nGITHUB WORKFLOW\nCommit/push. Open a PR. DO NOT MERGE. Add a comment to GitHub issue #2.'
+        with patch('issue_action.github_session'),patch('issue_action.lookup',return_value={'number':2}), \
+             patch('gmail_poller.Job'),patch('gmail_poller.subprocess.Popen') as popen:
+            proc=popen.return_value.__enter__.return_value
+            proc.communicate.return_value=('{}',''); proc.returncode=0
+            result=worker.run_codex(self.cfg,{'task_id':'TEST','request_text':request})
+            self.assertEqual(result['facts']['delivery_plan'],dict(publish=True,create_pr=True,post_comment=True,issue_number=2))
+            prompt=proc.communicate.call_args.args[0]
+            self.assertIn('POST_COMMENT: YES',prompt)
+            popen.reset_mock()
+            from workflow import WorkflowError
+            with self.assertRaises(WorkflowError):
+                worker.run_codex(self.cfg,{'task_id':'TEST','request_text':'TASK_TYPE=ENGINEERING\nPR_REQUIRED=true\nGITHUB\nDo something on GitHub.'})
+            popen.assert_not_called()
+
     def test_review_comment_requires_marker_and_updates_reply(self):
         self.cfg['publish_remote']='https://github.com/example/repo'
         def result(cfg,task):
@@ -435,6 +471,50 @@ class WorkerTests(unittest.TestCase):
             publish.assert_called_once()
         reports=[json.loads(p.read_text()) for p in (self.root/'reports').glob('*.json')]
         self.assertTrue(any('remote SHA verified' in r['github_access_status'] for r in reports))
+
+    def test_blocked_engineering_still_routes_authorized_status(self):
+        def result(cfg,task):
+            data=self.fake(cfg,task)
+            report=json.loads(data['stdout']); report['outcome']='BLOCKED'
+            data.update(engineering=True,stdout=json.dumps(report))
+            return data
+        with patch('github_delivery.deliver') as deliver:
+            worker.poll(self.cfg,[self.message()],result)
+            deliver.assert_called_once()
+        report=json.loads(next((self.root/'reports').glob('*.json')).read_text())
+        self.assertEqual(report['outcome'],'BLOCKED')
+
+    def test_blocked_workflow_comment_and_email_end_to_end(self):
+        gmail=self.reply_gmail()
+        self.cfg['publish_remote']='https://github.com/example/repo'
+        raw=self.raw+b'\nTASK_TYPE=ENGINEERING\nPR_REQUIRED=true\nGITHUB WORKFLOW\nCommit/push. Open a PR. DO NOT MERGE. Add a status comment to GitHub issue #2.\n'
+        gmail.get.return_value['raw']=base64.urlsafe_b64encode(b'Message-ID: <original@example.invalid>\n'+raw).decode()
+        def blocked(cfg,task):
+            result=self.fake(cfg,task)
+            report=json.loads(result['stdout'])
+            report.update(outcome='BLOCKED',summary='Provider pricing could not be verified')
+            result.update(engineering=True,stdout=json.dumps(report))
+            return result
+        with patch('publishing.publish') as push, patch('github_delivery.pull_request') as pr, \
+             patch('issue_action.comment',return_value={'url':'https://github.com/example/repo/issues/2#issuecomment-123'}) as post:
+            worker.poll(self.cfg,[self.message(raw=raw)],blocked,gmail=gmail)
+            worker.poll(self.cfg,[self.message(raw=raw)],blocked,gmail=gmail)
+        push.assert_not_called(); pr.assert_not_called(); post.assert_called_once()
+        gmail.session.post.assert_called_once()
+        mail=BytesParser(policy=policy.default).parsebytes(base64.urlsafe_b64decode(gmail.session.post.call_args.kwargs['json']['raw']))
+        report=json.loads(mail.get_content().split('\n\n',1)[1])
+        self.assertEqual(report['implementation_outcome'],'BLOCKED')
+        self.assertEqual(report['delivery']['post_comment']['status'],'DELIVERED')
+        self.assertEqual(report['delivery']['publish']['status'],'SKIPPED_INCOMPLETE')
+        self.assertIn('issuecomment-123',report['summary'])
+
+    def test_workflow_preflight_error_is_explained_without_launch(self):
+        from workflow import WorkflowError
+        def invalid(cfg,task):
+            raise WorkflowError('Conflicting issue targets')
+        worker.poll(self.cfg,[self.message()],invalid)
+        report=json.loads(next((self.root/'reports').glob('*.json')).read_text())
+        self.assertIn('before Codex launch: Conflicting issue targets',report['summary'])
 
 
 if __name__=='__main__':
