@@ -424,6 +424,10 @@ class WorkerTests(unittest.TestCase):
         with patch('snapshot_action.run',return_value={}) as snapshot:
             worker.run_codex(self.cfg,{'task_id':'TEST','request_text':'ACTION: SNAPSHOT'})
             self.assertEqual(snapshot.call_args.args[0]['repository'],str(self.repo))
+            worker.run_codex(self.cfg,{'task_id':'TEST','request_text':
+                'Create a fresh research export using the existing crypto_radar.analysis_snapshot analysis exporter, not the weekly-report or full-database snapshot workflow.'})
+            self.assertEqual(snapshot.call_count,2)
+            self.assertEqual(snapshot.call_args.args[0]['repository'],str(self.repo))
 
     def test_workflow_preflight_precedes_codex_and_supplies_plan(self):
         self.cfg.update(engineering_enabled=True,publish_remote='https://github.com/example/repo')

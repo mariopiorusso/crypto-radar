@@ -256,3 +256,19 @@ research limitations, see [CRADAR-VALIDATION-003](CRADAR_VALIDATION_003.md).
 ApeWisdom supports up to 100 explicit mappings; StockGeist and X retain their
 50-mapping limit. Use actual provider tickers (the observed crypto format is
 `BTC.X`), not bare symbols. Configured aliases do not establish live coverage.
+
+## Full scan mappings (2 November 2026)
+
+The local configuration now explicitly maps all 100 coins in the latest market
+scan to their uppercase symbol plus ApeWisdom's `.X` crypto suffix. The live
+endpoint returned BTC.X (Bitcoin), XRP.X (XRP), LINK.X (Chainlink), XMR.X (Monero)
+and ID.X (Everest); the first four match this scan, while Everest is outside it.
+Mappings for absent coins are prospective, not evidence of provider coverage.
+ApeWisdom accepts up to 100 explicit mappings; other providers retain their
+50-mapping limit. Symbol uniqueness is checked before generating the configuration
+and case-insensitive duplicate provider symbols are rejected at validation.
+
+These mappings are a fixed snapshot of the scan universe, not automatic fuzzy
+resolution. Review them when the top 100 changes, especially renamed tokens or
+reused symbols. Missing assets remain unavailable. Previously collected unresolved
+snapshots are retained unchanged; corrected IDs apply to subsequent collections.

@@ -26,23 +26,53 @@ operation continue independently of engineering checkout changes.
 ## Authorized snapshot action
 
 Send `[CRADAR TASK] SNAPSHOT-002` as the subject, or include the exact line
-`ACTION: SNAPSHOT` in a tagged email. Trusted sender validation still applies.
+`ACTION: ANALYSIS_SNAPSHOT` (or `ACTION: SNAPSHOT`) in a tagged email.
+An instruction beginning Create, Generate or Export and naming
+`crypto_radar.analysis_snapshot` also routes here. Trusted sender validation still applies.
 This selects a fixed Python action instead of Codex. Other requests use the configured Codex execution mode.
-The action uses the repository's `.venv` and existing `build_archive` / `DriveClient`
+The action uses the live repository's `.venv` and existing `analysis_snapshot.export_snapshot` / `DriveClient`
 implementations. Only its subprocess loads the existing Drive configuration from
 `.env`; credentials and email text are never passed as command arguments.
 
-It creates a timestamped ZIP containing `data/crypto_radar.db`, `config.yaml` and
-`crypto_radar/intelligence/statistical.py`, using SQLite backup and quick_check.
-It uploads to the configured Drive account/folder and verifies size, name, MIME type,
-parent and checksum. Email cannot select commands, source paths or destinations.
-The reply includes the result, ZIP path/size/hash, timestamp and Drive link.
+It creates an analysis-only research database with the exporter's 84-day retention
+and ownership closure policy, metadata, limitations and SQLite integrity checks.
+The read-only backup phase has a fifteen-minute deadline. Only the disposable
+backup destination uses `synchronous=OFF`; source durability and journal settings
+are never changed. Backup progress reports copied/remaining pages, elapsed time,
+SQLite status and increases in remaining pages (restart indications, not proof of
+their cause). A global lock prevents
+concurrent worker exports. Legacy full-database state is rejected.
+The compressed export is packaged into numbered ZIP volumes, each strictly below
+190,000,000 bytes including metadata, with a separate manifest containing volume
+SHA-256 hashes and export coverage. The unsplit archive is never uploaded.
+The destination is the configured Drive account and the fixed approved Crypto Radar
+folder `16ERwJgH4ns3IDA0TBzLacHHEKEhFg_qG`; a different folder fails closed.
+Local verification covers ZIP CRC, chunks and the reconstructed export SHA-256.
+Remote verification uses Drive metadata readback (MD5, size, name, parent and volume
+MIME type), not a downloaded remote SHA-256. Email cannot select commands, paths or
+destinations. Results include volume sizes/hashes, manifest link and export metadata.
+Drive authorization is refreshed after the long local export and before uploading.
+The separate JSON manifest accepts Drive's `application/json` MIME type as well as
+the legacy binary MIME type; its exact bytes are verified by size and checksum.
+After all uploads and reconstruction checks pass, the action rechecks Drive
+metadata for every volume and the manifest, then removes only that job's local
+analysis database, unsplit ZIP and numbered volume ZIPs. Small manifests, hashes,
+upload IDs and progress records remain. Completed retries recheck remote delivery
+and resume cleanup without exporting or uploading again. Missing/mismatched remote
+files block deletion. File deletion errors are recorded as `cleanup.status=pending`
+with filenames; upload success remains recorded and cleanup can be retried.
 
 Archives and upload state live in ignored `orchestration_worker/snapshots/`, keyed
 by Gmail message ID. This does not reuse weekly report state or overwrite older
 snapshots. A preallocated Drive ID supports recovery without creating another file.
 The source database is opened read-only; scanner processes are not stopped.
-The fixed action has a 20-minute timeout. An interrupted/failed action is not
+`progress.json` records backup counters, analysis stages, packaging/upload and
+completion. Export failures retain the failed stage and explicitly record that
+uploads have not started. The fixed
+action has a two-hour timeout and contains its child process tree in a Windows job.
+The poller scheduler allows 150 minutes so it can record and deliver a timeout result.
+Forced termination may leave local temporary files; inspect state before cleanup.
+An interrupted/failed action is not
 automatically rerun; inspect its saved state before retrying. Mock/offline tests
 never upload. Run snapshot tests using the repository `.venv`, which contains the
 existing report dependencies.

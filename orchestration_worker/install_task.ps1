@@ -1,4 +1,4 @@
-param([ValidateRange(1,60)][int]$EveryMinutes = 1)
+param([ValidateRange(1,60)][int]$EveryMinutes = 5)
 $ErrorActionPreference = 'Stop'
 $workerRoot = $PSScriptRoot
 $workerPython = Join-Path $workerRoot '.venv\Scripts\pythonw.exe'
@@ -16,7 +16,7 @@ $workerAction = New-ScheduledTaskAction -Execute $workerPython `
 $workerTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) `
     -RepetitionInterval (New-TimeSpan -Minutes $EveryMinutes)
 $workerSettings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable `
-    -ExecutionTimeLimit (New-TimeSpan -Minutes 30) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+    -ExecutionTimeLimit (New-TimeSpan -Minutes 150) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 Register-ScheduledTask -TaskName $workerName -Action $workerAction -Trigger $workerTrigger `
     -Principal $workerPrincipal -Settings $workerSettings `
     -Description 'Deterministic Gmail polling; fixed read-only Codex handshake only when accepted work exists.' -Force | Out-Null

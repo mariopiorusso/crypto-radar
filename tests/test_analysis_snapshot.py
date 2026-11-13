@@ -13,6 +13,20 @@ from crypto_radar.analysis_snapshot import export_snapshot, TIMES, page_storage
 
 
 class AnalysisSnapshotTests(unittest.TestCase):
+    def test_backup_deadline_cleans_temporary_output(self):
+        output=self.root/'timeout.db'
+        before=self.source.read_bytes()
+        updates=[]
+        with patch('crypto_radar.analysis_snapshot.time.monotonic',side_effect=[0,901]):
+            with self.assertRaisesRegex(TimeoutError,'backup exceeded'):
+                export_snapshot(self.source,output,as_of=self.now,progress=updates.append)
+        self.assertEqual(updates[-1]['stage'],'backup')
+        self.assertIn('restart_indications',updates[-1])
+        self.assertFalse(output.exists())
+        self.assertFalse(output.with_suffix('.db.lock').exists())
+        self.assertFalse(list(self.root.glob('analysis-*')))
+        self.assertEqual(self.source.read_bytes(),before)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

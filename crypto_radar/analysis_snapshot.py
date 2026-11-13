@@ -10,6 +10,7 @@ from pathlib import Path
 import sqlite3
 import subprocess
 import tempfile
+import time
 import zipfile
 
 VERSION = '1.0'
@@ -350,14 +351,18 @@ def summaries(conn):
         conn.execute(f'CREATE VIEW {q(name)} AS {sql}')
 
 
-def validate(conn, edges):
+def validate(conn, edges, progress=None):
+    if progress: progress('quick_check')
     if conn.execute('PRAGMA quick_check').fetchall() != [('ok',)]:
         raise ValueError('quick_check failed')
+    if progress: progress('integrity_check')
     if conn.execute('PRAGMA integrity_check').fetchall() != [('ok',)]:
         raise ValueError('integrity_check failed')
+    if progress: progress('foreign_key_check')
     if conn.execute('PRAGMA foreign_key_check').fetchone():
         raise ValueError('Encoded text reference integrity failed')
     for child, cc, parent, pc in edges:
+        if progress: progress('relationship_check',child=child,parent=parent)
         joins = ' AND '.join(f'c.{q(a)}=p.{q(b)}' for a, b in zip(cc, pc))
         present = ' AND '.join('c.'+q(a)+' IS NOT NULL' for a in cc)
         if conn.execute(f'SELECT 1 FROM {q(child)} c WHERE {present} AND NOT EXISTS '
@@ -365,9 +370,15 @@ def validate(conn, edges):
             raise ValueError(f'Orphaned relationship: {child} -> {parent}')
 
 
-def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=None):
+def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=None,
+                    backup_timeout_seconds=900, progress=None):
     if history_days < 1:
         raise ValueError('history_days must be positive')
+    if backup_timeout_seconds <= 0:
+        raise ValueError('backup_timeout_seconds must be positive')
+    def report(stage, **details):
+        if progress:
+            progress(dict(stage=stage,updated_utc=datetime.now(timezone.utc).isoformat(),**details))
     now = as_of or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError('as_of must have a timezone')
@@ -391,7 +402,35 @@ def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=No
             built = Path(temporary)/'analysis.db'
             with closing(sqlite3.connect(source.as_uri()+'?mode=ro', uri=True, timeout=30)) as live:
                 with closing(sqlite3.connect(backup)) as frozen:
-                    live.backup(frozen, pages=1024, sleep=0.01)
+                    # Only the disposable destination: avoid syncing partial backup pages.
+                    # The live source retains its configured durability and locking mode.
+                    frozen.execute('PRAGMA synchronous=OFF')
+                    started=time.monotonic()
+                    deadline=started+backup_timeout_seconds
+                    previous_remaining=None
+                    restarts=0
+                    callbacks=0
+                    backup_diagnostics={}
+                    last_report=started-5
+                    def backup_progress(status, remaining, total):
+                        nonlocal previous_remaining, restarts, callbacks, last_report
+                        callbacks+=1
+                        if previous_remaining is not None and remaining > previous_remaining:
+                            restarts+=1
+                        previous_remaining=remaining
+                        now_monotonic=time.monotonic()
+                        backup_diagnostics.update(elapsed_seconds=round(now_monotonic-started,1),
+                            remaining_pages=remaining,total_pages=total,copied_pages=total-remaining,
+                            restart_indications=restarts,callbacks=callbacks,sqlite_status=status)
+                        if now_monotonic-last_report >= 5 or remaining==0 or now_monotonic>=deadline:
+                            report('backup',**backup_diagnostics)
+                            last_report=now_monotonic
+                        if now_monotonic >= deadline:
+                            raise TimeoutError(f'Read-only SQLite backup exceeded {backup_timeout_seconds}s deadline; '
+                                               f'{total-remaining}/{total} pages copied; '
+                                               f'{restarts} restart indications; source unchanged')
+                    live.backup(frozen, pages=1024, sleep=0.01, progress=backup_progress)
+            report('analysis_build')
             with closing(sqlite3.connect(built.as_uri(), uri=True)) as conn:
                 conn.execute('ATTACH DATABASE ? AS src', (backup.as_uri()+'?mode=ro',))
                 tables = {r[0] for r in conn.execute("SELECT name FROM src.sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
@@ -407,13 +446,20 @@ def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=No
                 edges, baseline = select_rows(conn, cutoff)
                 encoder = TextEncoder(conn)
                 for table in source_times(conn):
+                    report('copy_table',table=table)
                     copy_table(conn, table, encoder)
                 for table in ('benchmark_outcomes', 'benchmark_context', 'experiment_outcomes'):
+                    report('factor_measurements',table=table)
                     factor_measurements(conn, table)
-                stats = {table: diagnostics(conn, table) for table in source_times(conn)}
+                stats={}
+                for table in source_times(conn):
+                    report('table_diagnostics',table=table)
+                    stats[table]=diagnostics(conn,table)
+                report('summaries')
                 summaries(conn)
                 for _, sql in conn.execute("SELECT name,sql FROM src.sqlite_master WHERE type='view'").fetchall():
                     conn.execute(sql)
+                report('source_storage_analysis')
                 try:
                     storage = [dict(name=r[0], bytes=r[1]) for r in conn.execute("SELECT name,sum(pgsize) FROM dbstat('src') GROUP BY name")]
                 except sqlite3.OperationalError:
@@ -422,6 +468,7 @@ def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=No
                 metadata = dict(exporter_version=VERSION, export_timestamp_utc=datetime.now(timezone.utc).isoformat(),
                     cutoff_reference_utc=now.isoformat(), source_db_path=str(source), source_schema_version=version,
                     source_snapshot_bytes=backup.stat().st_size, source_file_bytes=source.stat().st_size,
+                    backup_diagnostics=backup_diagnostics,
                     source_storage_pages=storage, source_page_count=conn.execute('PRAGMA src.page_count').fetchone()[0],
                     source_free_pages=conn.execute('PRAGMA src.freelist_count').fetchone()[0],
                     requested_history_days=history_days, requested_cutoff_utc=cutoff, baseline_start_utc=baseline,
@@ -433,15 +480,19 @@ def export_snapshot(source, output=None, history_days=84, zipped=False, as_of=No
                 conn.execute('CREATE TABLE snapshot_metadata (key TEXT PRIMARY KEY,value_json TEXT NOT NULL)')
                 conn.executemany('INSERT INTO snapshot_metadata VALUES (?,?)', [(k,json.dumps(v)) for k,v in metadata.items()])
                 conn.commit()
-                validate(conn, edges)
+                report('validation')
+                validate(conn, edges, progress=report)
+                report('compaction')
                 conn.execute('VACUUM')  # Destination ONLY, never source or frozen backup.
                 if conn.execute('PRAGMA quick_check').fetchall() != [('ok',)]:
                     raise ValueError('Post-compaction quick_check failed')
             # Hard links publish without replace semantics, including concurrent external creation.
             os.link(built, output)
             if zipped:
+                report('compression')
                 with zipfile.ZipFile(zip_path, 'x', zipfile.ZIP_LZMA) as archive:
                     archive.write(output, output.name)
+            report('export_complete')
             return dict(path=str(output), zip_path=str(zip_path) if zipped else None,
                         analysis_bytes=output.stat().st_size, zip_bytes=zip_path.stat().st_size if zipped else None,
                         compression_ratio=output.stat().st_size/zip_path.stat().st_size if zipped else None, **metadata)
