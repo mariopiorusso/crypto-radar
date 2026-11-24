@@ -46,11 +46,29 @@ tickers, credentials or exception messages. Retries reset request diagnostics so
 a timeout cannot inherit a previous response's HTTP status. Failures still roll
 back all snapshot rows; malformed evidence is never accepted or replaced by zero.
 
-Example future error:
+Example cross-page ambiguity diagnostic:
 
 ```json
-{"category":"malformed","phase":"row_validation","reason":"duplicate_ticker","page":2,"attempt":1,"row_index":0,"field":"ticker","first_page":1,"http_status":200,"media":"json","body_bytes":1234}
+{"category":"malformed","phase":"row_validation","reason":"ambiguous_ticker","page":2,"attempt":1,"row_index":0,"field":"ticker","first_page":1,"duplicate_scope":"cross_page","http_status":200,"media":"json","body_bytes":1234}
 ```
+
+## Cross-page duplicate handling
+
+The 23 November snapshot now supplies the immediate failure trigger: row validation
+on page two found a ticker already present on page one in an HTTP 200 JSON response.
+That rules out a malformed URL as the observed trigger, but the historical response
+body was not retained, so it cannot establish whether rankings moved between page
+requests or whether separate assets shared a ticker. The
+[documented API example](https://apewisdom.io/api/) provides ticker and name fields,
+not a stable asset ID that can resolve that ambiguity.
+
+The collector therefore does not merge duplicate tickers. A cross-page collision
+records a bounded `ambiguous_ticker` diagnostic and an incomplete (`partial`) run,
+with zero resources and no snapshot rows; consumers requiring complete available
+runs cannot turn the discarded pages into attention evidence. A same-page duplicate
+remains a malformed failed run with a distinct `same_page_duplicate_ticker` reason.
+This contains the failure safely without claiming which upstream behavior caused
+the overlap or that live collection has recovered.
 
 ## Regression coverage and next step
 
@@ -59,13 +77,19 @@ different causal inputs and assert distinct diagnostics, rollback and privacy.
 They cover duplicates, mismatched pagination, results shape, invalid counts,
 invalid URL, HTML/JSON decoding, oversized and non-object responses, throttling,
 authentication, server errors, timeout/connection failures, retry cleanup and
-successful paginated collection with negative net votes and missing values.
+successful paginated collection with negative net votes and missing values. New
+fixtures cover rank movement, repeated tickers with both shared and distinct IDs,
+same-page duplicates, and the zero-row incomplete result.
 
 Validation: Python compilation passed; all 184 application tests and 82 worker
 tests passed. The fresh Windows worktree initially had two unrelated worker-test
 failures because Git converted the sample email to CRLF while those tests assume
 LF input. Reusing the exact committed LF fixture (no Git diff) resolves both;
 this PR does not modify the worker tests or its publication preflight parser.
+
+Validation for the 24 November duplicate handling change: all 187 application
+tests passed, including the 34 attention tests; Python compilation and
+`git diff --check` passed.
 
 After review and an independently authorized deployment, inspect the next failed
 run's JSON reason and phase before proposing a behavior change. No scanner
