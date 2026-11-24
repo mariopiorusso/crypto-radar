@@ -239,6 +239,7 @@ class ApeWisdomCollector(NativeCollector):
         key = self.run(conn,'all-crypto',now)
         rows = {}; complete = False; pages = 0
         seen_pages={}
+        ambiguous_ticker = False
         self._diagnostic={}
         try:
             for page in range(1,self.settings.max_pages+1):
@@ -261,26 +262,47 @@ class ApeWisdomCollector(NativeCollector):
                 if current_page != page:
                     raise ProviderError('malformed')
                 for index,item in enumerate(results):
-                    self._diagnostic.update(phase='row_validation',reason='invalid_row_or_missing_ticker',row_index=index,field='ticker')
-                    ticker = item['ticker']
+                    self._diagnostic.update(phase='row_validation',reason='invalid_row',row_index=index,field='ticker')
+                    if not isinstance(item,dict):
+                        raise ProviderError('malformed')
+                    ticker = item.get('ticker')
                     self._diagnostic['reason']='invalid_ticker'
                     if not isinstance(ticker,str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,100}',ticker):
                         raise ProviderError('malformed')
                     ticker=ticker.upper()
+                    if ticker in rows:
+                        first_page=seen_pages[ticker]
+                        if first_page != page:
+                            self._diagnostic.update(reason='ambiguous_ticker',field='ticker',
+                                first_page=first_page,duplicate_scope='cross_page')
+                            ambiguous_ticker=True
+                            break
+                        self._diagnostic.update(reason='same_page_duplicate_ticker',field='ticker',
+                            first_page=first_page,duplicate_scope='same_page')
+                        raise ProviderError('malformed')
                     # Net votes can be negative; mentions and ranks cannot.
                     values=[]
                     for field in ('mentions','upvotes','rank','mentions_24h_ago','rank_24h_ago'):
                         self._diagnostic.update(reason='invalid_count',field=field)
                         values.append(integer(item.get(field),signed=field=='upvotes'))
-                    if ticker in rows:
-                        self._diagnostic.update(reason='duplicate_ticker',field='ticker',first_page=seen_pages[ticker])
-                        raise ProviderError('malformed')
                     rows[ticker]=values
                     seen_pages[ticker]=page
+                if ambiguous_ticker:
+                    break
                 pages=page
                 if page>=total_pages:
                     complete=True; break
             receipt=clock()
+            if ambiguous_ticker:
+                # The API documents tickers and names, but no stable asset ID.
+                # Do not merge a possible distinct asset or persist a partial snapshot.
+                reason=json.dumps(dict(category='malformed',**self._diagnostic),
+                    sort_keys=True,separators=(',',':'))
+                conn.execute('''UPDATE attention_runs SET observed_ts=?,status='partial',
+                    complete=0,pages=?,resources=0,fingerprint=NULL,error=? WHERE id=?''',
+                    (receipt.isoformat(),pages,reason,key))
+                conn.commit()
+                return 'partial',0
             self._diagnostic=dict(phase='persistence',reason='persistence_failed',page=pages)
             fingerprint=hashlib.sha256(json.dumps(rows,sort_keys=True).encode()).hexdigest()
             previous=conn.execute("SELECT fingerprint FROM attention_runs WHERE provider='apewisdom' AND id!=? AND fingerprint IS NOT NULL ORDER BY observed_ts DESC LIMIT 1",(key,)).fetchone()

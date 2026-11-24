@@ -104,10 +104,12 @@ class AttentionTests(unittest.TestCase):
     def test_ape_second_page_failure_has_precise_reason_and_no_partial_rows(self):
         first=fixture('apewisdom.json'); first['pages']=2
         second=fixture('apewisdom.json'); second.update(pages=2,current_page=2)
-        cases=[('duplicate_ticker',copy.deepcopy(second)),
-               ('page_mismatch',dict(second,current_page=1)),
+        second['results'][0]['ticker']='OTHER'
+        cases=[('page_mismatch',dict(second,current_page=1)),
                ('invalid_results',dict(second,results={})),
                ('invalid_pages',dict(second,pages=0))]
+        invalid_row=copy.deepcopy(second); invalid_row['results']=[None]
+        cases.append(('invalid_row',invalid_row))
         invalid_count=copy.deepcopy(second);invalid_count['results'][0]['mentions']=-1
         cases.append(('invalid_count',invalid_count))
         for reason,payload in cases:
@@ -120,8 +122,50 @@ class AttentionTests(unittest.TestCase):
                 detail=json.loads(row['error'])
                 self.assertEqual((row['status'],row['pages']),('failed',1))
                 self.assertEqual((detail['page'],detail['reason']),(2,reason))
-                if reason=='duplicate_ticker': self.assertEqual(detail['first_page'],1)
                 self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+
+    def test_ape_cross_page_duplicate_is_incomplete_not_a_merged_snapshot(self):
+        first=fixture('apewisdom.json'); first['pages']=2
+        first['results'][0]['id']='asset-a'
+        moved=dict(ticker='EX',id='asset-a',rank=101,mentions='14',upvotes='22',
+            mentions_24h_ago='8',rank_24h_ago='2')
+        second=dict(count=101,pages=2,current_page=2,results=[moved])
+        self.session.get.side_effect=[response(first),response(second)]
+        collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True),self.session)
+        self.assertEqual(collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW),('partial',0))
+        run=self.db.execute('SELECT * FROM attention_runs').fetchone()
+        detail=json.loads(run['error'])
+        self.assertEqual((run['status'],run['complete'],run['pages'],run['resources']),('partial',0,1,0))
+        self.assertEqual((detail['reason'],detail['duplicate_scope'],detail['first_page'],detail['page']),
+            ('ambiguous_ticker','cross_page',1,2))
+        self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+        self.assertFalse(features(self.db,'example',NOW.isoformat())['apewisdom_observed'])
+
+    def test_ape_same_page_duplicate_is_rejected_with_specific_diagnostic(self):
+        payload=fixture('apewisdom.json')
+        payload['results'].append(copy.deepcopy(payload['results'][0]))
+        self.session.get.return_value=response(payload)
+        collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True),self.session)
+        with self.assertRaises(ProviderError):
+            collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW)
+        run=self.db.execute('SELECT * FROM attention_runs').fetchone()
+        detail=json.loads(run['error'])
+        self.assertEqual((run['status'],run['pages']),('failed',0))
+        self.assertEqual((detail['reason'],detail['duplicate_scope'],detail['first_page']),
+            ('same_page_duplicate_ticker','same_page',1))
+        self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+
+    def test_ape_cross_page_same_ticker_with_distinct_ids_is_not_merged(self):
+        first=fixture('apewisdom.json'); first['pages']=2
+        first['results'][0]['id']='asset-a'
+        second_row=dict(first['results'][0],id='asset-b',rank=101)
+        second=dict(count=101,pages=2,current_page=2,results=[second_row])
+        self.session.get.side_effect=[response(first),response(second)]
+        collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True),self.session)
+        self.assertEqual(collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW),('partial',0))
+        self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+        detail=json.loads(self.db.execute('SELECT error FROM attention_runs').fetchone()[0])
+        self.assertEqual((detail['reason'],detail['duplicate_scope']),('ambiguous_ticker','cross_page'))
 
     def test_ape_transport_diagnostics_are_safe_and_distinct(self):
         secret='fixture-secret-url-body-token'
