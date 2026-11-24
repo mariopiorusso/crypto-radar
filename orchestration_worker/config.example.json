@@ -15,6 +15,7 @@
   "log_path": "logs",
   "report_path": "reports",
   "lookback_days": 7,
+  "accept_after": "",
   "max_messages": 500,
   "max_tasks_per_poll": 1,
   "timeout_seconds": 300

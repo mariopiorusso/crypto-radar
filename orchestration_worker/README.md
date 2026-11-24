@@ -26,23 +26,53 @@ operation continue independently of engineering checkout changes.
 ## Authorized snapshot action
 
 Send `[CRADAR TASK] SNAPSHOT-002` as the subject, or include the exact line
-`ACTION: SNAPSHOT` in a tagged email. Trusted sender validation still applies.
+`ACTION: ANALYSIS_SNAPSHOT` (or `ACTION: SNAPSHOT`) in a tagged email.
+An instruction beginning Create, Generate or Export and naming
+`crypto_radar.analysis_snapshot` also routes here. Trusted sender validation still applies.
 This selects a fixed Python action instead of Codex. Other requests use the configured Codex execution mode.
-The action uses the repository's `.venv` and existing `build_archive` / `DriveClient`
+The action uses the live repository's `.venv` and existing `analysis_snapshot.export_snapshot` / `DriveClient`
 implementations. Only its subprocess loads the existing Drive configuration from
 `.env`; credentials and email text are never passed as command arguments.
 
-It creates a timestamped ZIP containing `data/crypto_radar.db`, `config.yaml` and
-`crypto_radar/intelligence/statistical.py`, using SQLite backup and quick_check.
-It uploads to the configured Drive account/folder and verifies size, name, MIME type,
-parent and checksum. Email cannot select commands, source paths or destinations.
-The reply includes the result, ZIP path/size/hash, timestamp and Drive link.
+It creates an analysis-only research database with the exporter's 84-day retention
+and ownership closure policy, metadata, limitations and SQLite integrity checks.
+The read-only backup phase has a fifteen-minute deadline. Only the disposable
+backup destination uses `synchronous=OFF`; source durability and journal settings
+are never changed. Backup progress reports copied/remaining pages, elapsed time,
+SQLite status and increases in remaining pages (restart indications, not proof of
+their cause). A global lock prevents
+concurrent worker exports. Legacy full-database state is rejected.
+The compressed export is packaged into numbered ZIP volumes, each strictly below
+190,000,000 bytes including metadata, with a separate manifest containing volume
+SHA-256 hashes and export coverage. The unsplit archive is never uploaded.
+The destination is the configured Drive account and the fixed approved Crypto Radar
+folder `16ERwJgH4ns3IDA0TBzLacHHEKEhFg_qG`; a different folder fails closed.
+Local verification covers ZIP CRC, chunks and the reconstructed export SHA-256.
+Remote verification uses Drive metadata readback (MD5, size, name, parent and volume
+MIME type), not a downloaded remote SHA-256. Email cannot select commands, paths or
+destinations. Results include volume sizes/hashes, manifest link and export metadata.
+Drive authorization is refreshed after the long local export and before uploading.
+The separate JSON manifest accepts Drive's `application/json` MIME type as well as
+the legacy binary MIME type; its exact bytes are verified by size and checksum.
+After all uploads and reconstruction checks pass, the action rechecks Drive
+metadata for every volume and the manifest, then removes only that job's local
+analysis database, unsplit ZIP and numbered volume ZIPs. Small manifests, hashes,
+upload IDs and progress records remain. Completed retries recheck remote delivery
+and resume cleanup without exporting or uploading again. Missing/mismatched remote
+files block deletion. File deletion errors are recorded as `cleanup.status=pending`
+with filenames; upload success remains recorded and cleanup can be retried.
 
 Archives and upload state live in ignored `orchestration_worker/snapshots/`, keyed
 by Gmail message ID. This does not reuse weekly report state or overwrite older
 snapshots. A preallocated Drive ID supports recovery without creating another file.
 The source database is opened read-only; scanner processes are not stopped.
-The fixed action has a 20-minute timeout. An interrupted/failed action is not
+`progress.json` records backup counters, analysis stages, packaging/upload and
+completion. Export failures retain the failed stage and explicitly record that
+uploads have not started. The fixed
+action has a two-hour timeout and contains its child process tree in a Windows job.
+The poller scheduler allows 150 minutes so it can record and deliver a timeout result.
+Forced termination may leave local temporary files; inspect state before cleanup.
+An interrupted/failed action is not
 automatically rerun; inspect its saved state before retrying. Mock/offline tests
 never upload. Run snapshot tests using the repository `.venv`, which contains the
 existing report dependencies.
@@ -419,3 +449,77 @@ inferred. Conflicting issue targets fail validation. Existing explicit
 remain available. Delivery runs in order: verified push, review PR, issue comment.
 PR creation has persistent at-most-once attempt tracking; ambiguous sends require
 inspection. Credentials remain in the supervisor. No automatic PR merge occurs.
+## GitHub workflow delivery
+
+Engineering emails may use `GITHUB`, `GITHUB WORKFLOW`, `GIT`, or `ROADMAP`
+sections. Plain or Markdown headings, numbered/bulleted lists, semicolons and
+sentences on the same line are supported. For example:
+
+```text
+TASK_TYPE=ENGINEERING
+PR_REQUIRED=true
+GITHUB WORKFLOW
+Commit/push. Open a PR. DO NOT MERGE. Add a status comment to GitHub issue #2.
+```
+
+`workflow.py` produces a single canonical delivery plan before Codex runs. The
+plan is logged and supplied to the agent. Conflicting fields, multiple issue
+targets, missing comment targets, and an unrecognized required PR fail preflight
+with a concrete explanation. Explicit YES/NO fields remain available; NO overrides
+inferred instructions. Conditional instructions, quoted replies and fenced examples
+do not confer authority. `PR_REQUIRED=true` validates the plan; it does not grant
+push permission on its own. Unsupported natural-language requests may still need
+clarification; no parser can promise to understand every possible email.
+
+Completed local work can be published and submitted as a PR. When implementation
+is blocked, the worker preserves that outcome and may still deliver an explicitly
+requested issue status comment; it does not push incomplete work or open its PR.
+Delivery uses the existing persistent deduplication records. Old failed emails
+are not automatically rerun. A push or PR delivery failure does not suppress an
+authorized status comment. Reports and reply emails show `implementation_outcome`
+and per-action `delivery` states/URLs separately, while preserving the existing
+overall outcome and task-state compatibility. Research prerequisites can still
+block implementation; a delivered status comment does not imply code completion.
+
+
+## Laptop email agent recovery (11 November 2026)
+
+Send plain-text mail to `cryptoradar128@gmail.com`, from a configured trusted
+sender, with `[CRADAR TASK]` in the subject. Put the request in the body. No
+`TASK_TYPE` or `MODE` is required. For example: "Fix the parser, run tests,
+commit and push. Open a PR. Do not merge." Explicit YES/NO fields still work.
+Replies arrive in the original email thread. New conversations start a saved
+Codex session; replies in the same Gmail thread from the same trusted sender
+resume that session. These sessions are separate from the IDE chat.
+
+The launcher discovers the newest installed Codex VS Code extension if its
+configured versioned executable disappears. Authentication stays in the existing
+local Codex login. Engineering remains workspace-write with no interactive
+approval prompts; supervisor-owned GitHub delivery uses the existing Git login.
+The laptop must be awake, online and signed in. Polling is installed every minute.
+
+`accept_after` is an ISO timestamp with a timezone. Requests received before this
+activation boundary are rejected without execution, preserving old task history.
+Completed or failed tasks are never replayed automatically. The restored live
+configuration sets a new boundary on activation. Changes run in the independent
+engineering checkout; they are not automatically merged or deployed to the scanner.
+
+## Persistent conversation history
+
+The additive `email_sessions` table maps the Gmail thread, authenticated sender,
+and repository to a Codex session ID. A different sender or repository never
+inherits another conversation. The CLI runs without `--ephemeral`; JSON events
+identify the session and final answer. Follow-ups use `exec resume` with that
+exact ID, never the most recent unrelated session. This email's delivery plan
+remains the authority for publishing, even if an earlier turn requested a push.
+
+Replies and per-task reports include `session_id` and `gmail_thread_id`.
+Open `reports/history.md` for prompts, results, status, and `codex resume` commands;
+`reports/history.json` supplies the same index for future tools. These are local,
+ignored runtime files. Normal Codex transcripts remain in the user's Codex session
+store. The worker history does not depend on sidebar discovery. External Codex
+sessions can be included in the Agents list's application filters, but automatic
+discovery of this CLI's saved sessions must be verified in the installed host.
+
+Older ephemeral tasks retain their existing prompts and reports, but have no
+recoverable Codex session ID. They are not rerun to manufacture conversation history.

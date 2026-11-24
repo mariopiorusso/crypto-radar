@@ -77,6 +77,147 @@ class AttentionTests(unittest.TestCase):
         self.assertFalse(features(self.db,'example',(later+timedelta(hours=1)).isoformat())['apewisdom_observed'])
         self.assertFalse(features(self.db,'example',(NOW-timedelta(seconds=1)).isoformat())['apewisdom_observed'])
 
+    def test_ape_negative_net_votes_are_preserved(self):
+        for value in (-8, '-8', -2**63):
+            with self.subTest(value=value):
+                data=fixture('apewisdom.json')
+                data['results'][0]['upvotes']=value
+                self.ape(payload=data)
+                row=self.db.execute("SELECT upvotes FROM apewisdom_snapshots WHERE ticker='EX' ORDER BY rowid DESC LIMIT 1").fetchone()
+                self.assertEqual(row[0],int(value))
+
+    def test_ape_invalid_counts_fail_without_partial_snapshots(self):
+        for field,value in (('mentions',-1),('rank',-1),('mentions_24h_ago',-1),
+                            ('rank_24h_ago',-1),('upvotes',True),('upvotes',1.5),
+                            ('upvotes',-2**63-1),('upvotes',2**63)):
+            with self.subTest(field=field,value=value):
+                data=fixture('apewisdom.json'); data['results'][1][field]=value
+                with self.assertRaises(ValueError): self.ape(payload=data)
+                row=self.db.execute('SELECT status,error FROM attention_runs ORDER BY rowid DESC LIMIT 1').fetchone()
+                self.assertEqual(row['status'],'failed')
+                diagnostic=json.loads(row['error'])
+                self.assertEqual(diagnostic['category'],'ValueError')
+                self.assertEqual(diagnostic['reason'],'invalid_count')
+                self.assertEqual(diagnostic['field'],field)
+        self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+
+    def test_ape_second_page_failure_has_precise_reason_and_no_partial_rows(self):
+        first=fixture('apewisdom.json'); first['pages']=2
+        second=fixture('apewisdom.json'); second.update(pages=2,current_page=2)
+        second['results'][0]['ticker']='OTHER'
+        cases=[('page_mismatch',dict(second,current_page=1)),
+               ('invalid_results',dict(second,results={})),
+               ('invalid_pages',dict(second,pages=0))]
+        invalid_row=copy.deepcopy(second); invalid_row['results']=[None]
+        cases.append(('invalid_row',invalid_row))
+        invalid_count=copy.deepcopy(second);invalid_count['results'][0]['mentions']=-1
+        cases.append(('invalid_count',invalid_count))
+        for reason,payload in cases:
+            with self.subTest(reason=reason):
+                self.session.get.side_effect=[response(first),response(payload)]
+                collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True),self.session)
+                with self.assertRaises((ProviderError,ValueError)):
+                    collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW)
+                row=self.db.execute('SELECT * FROM attention_runs ORDER BY rowid DESC LIMIT 1').fetchone()
+                detail=json.loads(row['error'])
+                self.assertEqual((row['status'],row['pages']),('failed',1))
+                self.assertEqual((detail['page'],detail['reason']),(2,reason))
+                self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+
+    def test_ape_cross_page_duplicate_is_incomplete_not_a_merged_snapshot(self):
+        first=fixture('apewisdom.json'); first['pages']=2
+        first['results'][0]['id']='asset-a'
+        moved=dict(ticker='EX',id='asset-a',rank=101,mentions='14',upvotes='22',
+            mentions_24h_ago='8',rank_24h_ago='2')
+        second=dict(count=101,pages=2,current_page=2,results=[moved])
+        self.session.get.side_effect=[response(first),response(second)]
+        collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True),self.session)
+        self.assertEqual(collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW),('partial',0))
+        run=self.db.execute('SELECT * FROM attention_runs').fetchone()
+        detail=json.loads(run['error'])
+        self.assertEqual((run['status'],run['complete'],run['pages'],run['resources']),('partial',0,1,0))
+        self.assertEqual((detail['reason'],detail['duplicate_scope'],detail['first_page'],detail['page']),
+            ('ambiguous_ticker','cross_page',1,2))
+        self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+        self.assertFalse(features(self.db,'example',NOW.isoformat())['apewisdom_observed'])
+
+    def test_ape_same_page_duplicate_is_rejected_with_specific_diagnostic(self):
+        payload=fixture('apewisdom.json')
+        payload['results'].append(copy.deepcopy(payload['results'][0]))
+        self.session.get.return_value=response(payload)
+        collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True),self.session)
+        with self.assertRaises(ProviderError):
+            collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW)
+        run=self.db.execute('SELECT * FROM attention_runs').fetchone()
+        detail=json.loads(run['error'])
+        self.assertEqual((run['status'],run['pages']),('failed',0))
+        self.assertEqual((detail['reason'],detail['duplicate_scope'],detail['first_page']),
+            ('same_page_duplicate_ticker','same_page',1))
+        self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+
+    def test_ape_cross_page_same_ticker_with_distinct_ids_is_not_merged(self):
+        first=fixture('apewisdom.json'); first['pages']=2
+        first['results'][0]['id']='asset-a'
+        second_row=dict(first['results'][0],id='asset-b',rank=101)
+        second=dict(count=101,pages=2,current_page=2,results=[second_row])
+        self.session.get.side_effect=[response(first),response(second)]
+        collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True),self.session)
+        self.assertEqual(collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW),('partial',0))
+        self.assertEqual(self.db.execute('SELECT count(*) FROM apewisdom_snapshots').fetchone()[0],0)
+        detail=json.loads(self.db.execute('SELECT error FROM attention_runs').fetchone()[0])
+        self.assertEqual((detail['reason'],detail['duplicate_scope']),('ambiguous_ticker','cross_page'))
+
+    def test_ape_transport_diagnostics_are_safe_and_distinct(self):
+        secret='fixture-secret-url-body-token'
+        invalid_json=response({});invalid_json.headers={'Content-Type':'text/html; '+secret}
+        invalid_json.json.side_effect=ValueError(secret)
+        oversized=response({});oversized.content=b'x'*(8*1024*1024+1)
+        cases=[('invalid_url',requests.exceptions.InvalidURL(secret)),
+               ('timeout',requests.Timeout(secret)),('connection_error',requests.ConnectionError(secret)),
+               ('invalid_json',invalid_json),('malformed',response([])),
+               ('malformed',oversized),('rate_limited',response({},429)),
+               ('unauthorized',response({},403)),('failed',response({},503))]
+        for category,value in cases:
+            with self.subTest(category=category):
+                self.session.get.side_effect=value if isinstance(value,Exception) else None
+                self.session.get.return_value=value
+                collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True,max_attempts=1),self.session)
+                with self.assertRaises((requests.RequestException,ProviderError,ValueError)):
+                    collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW)
+                raw=self.db.execute('SELECT error FROM attention_runs ORDER BY rowid DESC LIMIT 1').fetchone()[0]
+                detail=json.loads(raw)
+                self.assertEqual(detail['category'],category)
+                self.assertNotIn(secret,raw)
+                self.assertLess(len(raw),500)
+                if value is invalid_json: self.assertEqual(detail['media'],'html')
+                if value is oversized: self.assertEqual(detail['reason'],'body_too_large')
+
+    def test_ape_terminal_retry_does_not_retain_stale_http_details(self):
+        self.session.get.side_effect=[response({},503),requests.Timeout('secret')]
+        collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True,max_attempts=2),self.session)
+        with patch('crypto_radar.collectors.attention.time.sleep') as sleep:
+            with self.assertRaises(requests.Timeout):
+                collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW)
+        sleep.assert_called_once_with(1)
+        detail=json.loads(self.db.execute('SELECT error FROM attention_runs').fetchone()[0])
+        self.assertEqual((detail['category'],detail['attempt'],detail['page']),('timeout',2,1))
+        self.assertNotIn('http_status',detail)
+        self.assertNotIn('secret',json.dumps(detail))
+
+    def test_ape_valid_pagination_and_transient_retry_keep_native_semantics(self):
+        first=fixture('apewisdom.json');first['pages']=2
+        second=dict(count=3,pages=2,current_page=2,results=[dict(ticker='OTHER',mentions=0,upvotes=-3,rank=3)])
+        self.session.get.side_effect=[requests.Timeout('secret'),response(first),response(second)]
+        collector=ApeWisdomCollector(ApeSettings(enabled=True,access_confirmed=True,max_attempts=2),self.session)
+        with patch('crypto_radar.collectors.attention.time.sleep') as sleep:
+            self.assertEqual(collector.collect_persist(self.db,ASSETS,NOW,lambda:NOW),('available',3))
+        sleep.assert_called_once_with(1)
+        self.assertEqual([call.args[0] for call in self.session.get.call_args_list],
+            ['https://apewisdom.io/api/v1.0/filter/all-crypto/page/1']*2+
+            ['https://apewisdom.io/api/v1.0/filter/all-crypto/page/2'])
+        row=self.db.execute("SELECT mentions,upvotes,mentions_24h_ago FROM apewisdom_snapshots WHERE ticker='OTHER'").fetchone()
+        self.assertEqual(tuple(row),(0,-3,None))
+
     def test_explicit_asset_resolution_rejects_ambiguity(self):
         self.assertEqual(resolve(ASSETS,{'other':'EX'}),{})
         with self.assertRaises(ValueError):

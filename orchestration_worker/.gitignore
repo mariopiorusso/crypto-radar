@@ -8,4 +8,5 @@ state/
 logs/
 reports/
 snapshots/
+analysis-export.lock
 workspaces/

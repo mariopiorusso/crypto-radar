@@ -42,11 +42,125 @@ database:
 
 # Explicit --detector v11|v12|all overrides this switch. Deployment is opt-in.
 v12:
-  enabled: false
+  enabled: true
   max_market_age_seconds: 600
   social:
-    enabled: false
+    enabled: true
     provider: none
+    providers: [apewisdom]
+    attention_max_age_seconds: 3600
+    provider_options:
+      apewisdom:
+        enabled: true
+        access_confirmed: true
+        # Explicit mappings for the 100-coin scan on 2026-11-02.
+        # ApeWisdom uses the .X crypto suffix; absent tickers remain unavailable.
+        asset_map:
+          aave: AAVE.X
+          algorand: ALGO.X
+          aptos: APT.X
+          arbitrum: ARB.X
+          aster-2: ASTER.X
+          avalanche-2: AVAX.X
+          beldex: BDX.X
+          bfusd: BFUSD.X
+          binancecoin: BNB.X
+          bitcoin: BTC.X
+          bitcoin-cash: BCH.X
+          bitget-token: BGB.X
+          bittensor: TAO.X
+          bitway: BTW.X
+          blackrock-usd-institutional-digital-liquidity-fund: BUIDL.X
+          blockstack: STX.X
+          canton-network: CC.X
+          cardano: ADA.X
+          chainlink: LINK.X
+          cosmos: ATOM.X
+          crypto-com-chain: CRO.X
+          dai: DAI.X
+          dash: DASH.X
+          dogecoin: DOGE.X
+          ethena: ENA.X
+          ethena-usde: USDE.X
+          ether-fi: ETHFI.X
+          ethereum: ETH.X
+          ethereum-classic: ETC.X
+          falcon-finance: USDF.X
+          figure-heloc: FIGR_HELOC.X
+          filecoin: FIL.X
+          gatechain-token: GT.X
+          gho: GHO.X
+          global-dollar: USDG.X
+          hashnote-usyc: USYC.X
+          hedera-hashgraph: HBAR.X
+          htx-dao: HTX.X
+          hyperliquid: HYPE.X
+          injective-protocol: INJ.X
+          internet-computer: ICP.X
+          janus-henderson-anemoy-aaa-clo-fund: JAAA.X
+          jupiter-exchange-solana: JUP.X
+          just: JST.X
+          kaspa: KAS.X
+          kucoin-shares: KCS.X
+          layerzero: ZRO.X
+          leo-token: LEO.X
+          lighter: LIT.X
+          litecoin: LTC.X
+          mantle: MNT.X
+          memecore: M.X
+          midnight-3: NIGHT.X
+          monero: XMR.X
+          morpho: MORPHO.X
+          near: NEAR.X
+          nexo: NEXO.X
+          okb: OKB.X
+          ondo-finance: ONDO.X
+          ondo-us-dollar-yield: USDY.X
+          open-usd: OUSD.X
+          pancakeswap-token: CAKE.X
+          pax-gold: PAXG.X
+          paypal-usd: PYUSD.X
+          pearl-2: PEARL.X
+          pepe: PEPE.X
+          pi-network: PI.X
+          polkadot: DOT.X
+          polygon-ecosystem-token: POL.X
+          pump-fun: PUMP.X
+          quant-network: QNT.X
+          rain: RAIN.X
+          render-token: RENDER.X
+          ripple: XRP.X
+          ripple-usd: RLUSD.X
+          shiba-inu: SHIB.X
+          sky: SKY.X
+          solana: SOL.X
+          spiko-amundi-overnight-swap-fund-eur: EURSAFO.X
+          stellar: XLM.X
+          sui: SUI.X
+          superstate-short-duration-us-government-securities-fund-ustb: USTB.X
+          tether: USDT.X
+          tether-gold: XAUT.X
+          the-open-network: GRAM.X
+          tron: TRX.X
+          uniswap: UNI.X
+          united-stables: U.X
+          usd-coin: USDC.X
+          usd1-wlfi: USD1.X
+          usdd: USDD.X
+          usdgo: USDGO.X
+          usds: USDS.X
+          usual-usd: USD0.X
+          venice-token: VVV.X
+          whitebit: WBT.X
+          world-liberty-financial: WLFI.X
+          worldcoin-wld: WLD.X
+          xdce-crowd-sale: XDC.X
+          zcash: ZEC.X
+        poll_seconds: 1800
+        retry_seconds: 900
+        timeout_seconds: 20
+        max_pages: 3
+        max_attempts: 3
     baseline_hours: 24
     min_baseline_windows: 12
     min_coverage: 0.8

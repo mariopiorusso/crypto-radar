@@ -4,7 +4,10 @@ V1.2 adds a parallel, opt-in news/social research detector. Read
 [the V1.2 experiment and deployment guide](docs/V1.2.md) for configuration,
 migration, measurement definitions, Windows commands and the validation protocol.
 The existing scheduled scanner is not automatically changed by this update.
-Social has no live adapter yet; V1.2 AI and alerts default to disabled.
+Optional StockGeist, ApeWisdom and X adapters are implemented but disabled by default.
+See [social provider setup](docs/SOCIAL_PROVIDERS.md) and
+[attention research setup](docs/CRYPTO_SOCIAL_002.md) for access requirements.
+V1.2 AI and alerts also default to disabled.
 
 Experimental early-warning research engine for crypto market anomalies.
 
@@ -21,22 +24,22 @@ Experimental early-warning research engine for crypto market anomalies.
 - Does **not** trade automatically.
 
 V1 deliberately uses public/API/RSS sources rather than bypassing social-media anti-bot controls.
-Reddit/X and labelled whale intelligence are Phase 2 collectors.
+Optional ApeWisdom and X attention research is available in V1.2; labelled whale
+intelligence remains future work.
 
 ## Windows 11 quick start
 
 ### 1. Install prerequisites
 
 Install Python 3.14 from python.org and Git, or keep the existing tested virtual environment.
+For a new environment, use the full path to the installed interpreter below.
 
 Open PowerShell in the cloned repo:
 
 ```powershell
-py -3.14 -m venv .venv
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements-lock.txt
+& "C:\path\to\Python314\python.exe" -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 ```
 
 ### 2. Configure secrets
@@ -58,29 +61,29 @@ replace it with a model shown in your OpenAI API account.
 CoinGecko can run keyless for prototyping. If you have a Demo key, add it as
 `COINGECKO_API_KEY`.
 
-### 3. Test one scan
+### 3. Run offline tests
 
 ```powershell
-python -m crypto_radar.main --once
+.\.venv\Scripts\python.exe -B -m unittest discover -s tests -v
 ```
 
-### 4. Run continuously
+### 4. Run the scanner
+
+Scans use live providers, can incur AI costs, and can send configured alerts.
+Review `config.yaml` first: V1.1 AI, email and Telegram are enabled in the checked-in
+configuration. Run a single scan with
+`.\.venv\Scripts\python.exe -m crypto_radar.main --once`, or run continuously:
 
 ```powershell
-python -m crypto_radar.main
+.\.venv\Scripts\python.exe -m crypto_radar.main
 ```
 
 Default interval is five minutes. Stop with Ctrl+C.
 
-### 5. Git
+### 5. Review changes with Git
 
-The `.gitignore` excludes `.env`, SQLite data and logs:
-
-```powershell
-git add .
-git commit -m "Initial Crypto Radar V1"
-git push
-```
+Keep secrets and runtime files untracked. Review `git status` and `git diff`,
+then stage only the files intended for your change before committing.
 
 ## Optional Telegram alerts
 
@@ -228,8 +231,9 @@ https://support.google.com/accounts/answer/185833 . Do not use your normal Gmail
 After saving `.env`, run `./start_mail_relay.ps1` to start the relay in the background.
 It validates settings before starting; logs are in `logs/mail-relay.log`.
 Restart the relay after changing its sender, password, port or recipient list.
-The launcher does not start the scanner or send a test email, and no auto-start task
-is installed. You can stop the relay using its reported process ID.
+The launcher does not start the scanner, send a test email, or install auto-start
+tasks. The separate `install_startup_tasks.ps1` installer described above installs
+boot tasks. You can stop the relay using its reported process ID.
 
 The relay acknowledges a message only after Gmail accepts it. It has no disk queue
 and does not retry ambiguous deliveries; errors propagate to the scanner's persisted
@@ -303,8 +307,10 @@ compatibility issue requires a change.
 
 ## Weekly file email
 
-`Crypto Radar - Weekly Files` emails `EMAIL_TO` every Monday at **09:00 Windows
-local time**, including after a missed start when the PC becomes available.
+By default, `install_weekly_report_task.ps1` configures `Crypto Radar - Weekly Files`
+to email `EMAIL_TO` every Monday at **09:00 Windows local time**, including after a
+missed start when the PC becomes available. The installed task may use another time
+or delivery mode; inspect Task Scheduler to confirm its actual configuration.
 Install/update it with `install_weekly_report_task.ps1` as administrator; use
 `-At '10:00'` to change its time. This is independent of market alert thresholds.
 
@@ -316,16 +322,14 @@ per-week delivery records remain in `data/weekly-reports`; logs are in
 across separate emails, with reassembly instructions and a SHA-256 checksum.
 Keep all parts to reconstruct the original ZIP. Local report archives are retained.
 
-Preview without sending: `python -m crypto_radar.weekly_report --dry-run`.
-Send manually: `python -m crypto_radar.weekly_report`. A successful weekly send
+Preview without sending: `.\.venv\Scripts\python.exe -m crypto_radar.weekly_report --dry-run`.
+Send manually: `.\.venv\Scripts\python.exe -m crypto_radar.weekly_report`. A successful weekly send
 is not repeated that ISO week. Uncertain delivery is recorded and requires checking
 the inbox before a manual retry, rather than risking duplicate emails.
 
-## Phase 2 roadmap
+## Google Drive delivery (requires setup)
 
-### Google Drive delivery (requires setup)
-
-`python -m crypto_radar.weekly_report --drive` uploads a single ZIP named
+`.\.venv\Scripts\python.exe -m crypto_radar.weekly_report --drive` uploads a single ZIP named
 `crypto-radar-YYYY-MM-DDTHHMMSSZ.zip` (UTC timestamp), with the same three files.
 `--drive --dry-run` builds a ZIP without authenticating or uploading.
 The authenticated account must match `GOOGLE_DRIVE_ACCOUNT`, and the existing
@@ -340,7 +344,7 @@ for these credentials. Enable Drive API for the OAuth client and authorize acces
 to the chosen folder. No credentials are written to upload state or logs.
 
 For one-time desktop OAuth authorization, run
-`python -m crypto_radar.authorize_drive "C:\path\to\client_secret.json"`.
+`.\.venv\Scripts\python.exe -m crypto_radar.authorize_drive "C:\path\to\client_secret.json"`.
 Sign in with the configured account in the browser. The helper verifies the
 account and target folder, then stores the client credentials and refresh token
 in `.env` without displaying them. It requests Google Drive access for the existing
@@ -358,59 +362,57 @@ so a retry can recover an accepted upload without creating another copy.
 Drive delivery state is separate from legacy email state. Archives stay private
 under the existing folder's permissions; no public sharing links are created.
 
-## Future signals
+## Compact research export and weekly analysis uploads
 
-After V1 has run reliably:
-
-1. Add exchange-native data (Binance/Coinbase/Kraken where appropriate).
-2. Add compliant Reddit/community APIs.
-3. Add labelled on-chain/whale provider.
-4. Add social velocity source.
-5. Backtest thresholds and calibrate the score.
-6. Add dashboard.
-<<<<<<< HEAD
-
-### Monday Drive snapshot confirmation
-
-`Crypto Radar - Weekly Files` is enabled for Mondays at **19:00 Windows local
- time**. It uses `python -B -m crypto_radar.weekly_report --drive --notify`:
-SQLite-consistent backup, timestamped ZIP in the configured Drive folder, checksum
-verification, then a confirmation email to `EMAIL_TO` (currently
-cryptoradar128@gmail.com). The existing three-file ZIP bundle is preserved.
-Delivery state prevents duplicate uploads and confirmation sends; ambiguous email
-sends require mailbox inspection before retry. Logs: `logs/weekly-report.log`.
-To reinstall as administrator:
-`./install_weekly_report_task.ps1 -At 19:00 -Drive -Notify`.
-
-### Scheduled compact analysis upload
-
-The Monday 19:00 `Crypto Radar - Weekly Files` task now runs:
+Create a standalone analysis database from a source database in this checkout:
 
 ```powershell
-python -B -m crypto_radar.weekly_report --drive --analysis --history-days 84 --notify
+.\.venv\Scripts\python.exe -B -m crypto_radar.analysis_snapshot --source .\data\crypto_radar.db --history-days 84 --zip
 ```
 
-It creates a fresh compact analysis SQLite database and uploads a single ZIP-LZMA
-containing that database to the existing configured Drive folder. The detailed
-history window is 84 days plus required relationship/baseline context. The source
-database remains authoritative and read-only to the exporter. Full-bundle upload
-remains available manually without `--analysis`.
+See the [analysis snapshot guide](docs/ANALYSIS_SNAPSHOT.md) for retention,
+integrity, query views, diagnostics and limitations. The standalone exporter does
+not change weekly scheduling.
+
+For a weekly compact analysis upload, the installer supports this explicit
+configuration (run as administrator on the intended deployment):
+
+```powershell
+.\install_weekly_report_task.ps1 -At '19:00' -Drive -Notify -Analysis
+```
+
+This replaces the existing weekly task with a Monday 19:00 local-time task running
+`-B -m crypto_radar.weekly_report --drive --analysis --history-days 84 --notify`
+through the repository virtual environment. It compresses a compact analysis
+SQLite database and uploads numbered ZIP volumes, each strictly below 200,000,000
+bytes including ZIP overhead. Download every volume, extract them into one folder,
+and run `python restore_snapshot.py` to reconstruct and checksum-verify the original
+ZIP. The confirmation includes the volume links and original SHA-256. The source
+database remains read-only to the exporter. `-CurrentUser` installs the task under
+the signed-in user without administrator access.
 
 Analysis uploads use separate `crypto-radar-analysis-<year>-W<week>.drive.json`
-state in `data/weekly-reports`, preserving old full-bundle delivery records.
-Confirmation still uses the existing email configuration and includes the Drive
-link and SHA-256. Logs remain in `logs/weekly-report.log`. ZIP-LZMA can be extracted
-with Python zipfile or 7-Zip. Install/update this schedule as administrator with:
-`./install_weekly_report_task.ps1 -At 19:00 -Drive -Notify -Analysis`.
-=======
-# Compact research export
+state in `data/weekly-reports`. Full three-file bundles remain available without
+`--analysis`. `-Analysis` and `-Notify` each require `-Drive`. Delivery state prevents
+duplicate uploads and confirmation sends; ambiguous email delivery requires inbox
+inspection before retry. Logs remain in `logs/weekly-report.log`.
+These are supported configurations, not confirmation of any live task's settings.
 
-Create a standalone analysis database without changing the live scanner:
+## Email-requested analysis exports
 
-```powershell
-python -m crypto_radar.analysis_snapshot --source C:\crypto-radar\data\crypto_radar.db --history-days 84 --zip
-```
+The [worker snapshot action](orchestration_worker/README.md#authorized-snapshot-action)
+routes explicit `crypto_radar.analysis_snapshot` requests to the approved read-only
+exporter. It uploads numbered ZIP volumes strictly below 190,000,000 bytes and a
+separate manifest to the configured Crypto Radar Drive folder. After verification,
+it deletes that job's local export database, archive and volumes, retaining small
+checksum/upload records. Failed or unverified delivery retains local files for
+recovery. These cleanup rules apply to worker exports; weekly reports retain their
+local archives.
 
-See [analysis snapshot guide](docs/ANALYSIS_SNAPSHOT.md) for retention, integrity,
-query views, diagnostics and limitations. This does not change weekly scheduling.
->>>>>>> 454f52ef7edd0e303744bee01fcd799868c918fd
+## Future signals
+
+1. Add exchange-native data (Binance/Coinbase/Kraken where appropriate).
+2. Extend compliant community and social research beyond the optional adapters.
+3. Add labelled on-chain/whale provider.
+4. Backtest thresholds and calibrate the score.
+5. Add dashboard.

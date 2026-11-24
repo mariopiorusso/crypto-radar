@@ -93,6 +93,10 @@ class DriveClient:
         self.session = requests.Session()
 
     def __enter__(self):
+        return self.refresh_authorization()
+
+    def refresh_authorization(self):
+        """Renew credentials and revalidate destination after a long local export."""
         try:
             token = self.session.post("https://oauth2.googleapis.com/token", data={
                 "client_id": os.environ["GOOGLE_DRIVE_CLIENT_ID"],
@@ -132,7 +136,7 @@ class DriveClient:
         return response.json()
 
     def upload(self, file_id, path, sha256):
-        mime = 'application/zip' if path.suffix == '.zip' else 'application/octet-stream'
+        mime = {'.zip':'application/zip','.json':'application/json'}.get(path.suffix,'application/octet-stream')
         response = self.session.post("https://www.googleapis.com/upload/drive/v3/files",
             params={"uploadType": "resumable", "fields": FIELDS, "supportsAllDrives": "true"},
             headers={"X-Upload-Content-Type": mime, "X-Upload-Content-Length": str(path.stat().st_size)},

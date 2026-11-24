@@ -22,12 +22,12 @@ def stamp(value):
     return result.astimezone(timezone.utc)
 
 
-def integer(value):
+def integer(value, *, signed=False):
     if value is None:
         return None
-    if isinstance(value, str) and re.fullmatch(r'\d+', value):
+    if isinstance(value, str) and re.fullmatch(r'-?\d+' if signed else r'\d+', value):
         value = int(value)
-    if type(value) is not int or not 0 <= value <= 2**63-1:
+    if type(value) is not int or not (-2**63 if signed else 0) <= value <= 2**63-1:
         raise ValueError('Invalid provider count')
     return value
 
@@ -125,6 +125,12 @@ def finish_usage(conn, key, state, quantity=None, settings=None):
 class NativeCollector:
     native_evidence = True
 
+    def response_received(self, response):
+        """Optional safe diagnostics hook; does not change transport policy."""
+
+    def payload_received(self, payload):
+        """Optional diagnostics hook before validating the decoded object."""
+
     def __init__(self, settings, session=None):
         self.settings = settings
         self.session = session or requests.Session()
@@ -153,6 +159,7 @@ class NativeCollector:
         try:
             response = self.session.get(url,params=params,headers=headers,
                 timeout=self.settings.timeout_seconds,allow_redirects=False)
+            self.response_received(response)
             if response.status_code == 429:
                 retry = response.headers.get('Retry-After','')
                 raise ProviderError('rate_limited', min(86400,int(retry)) if str(retry).isdigit() else self.settings.retry_seconds)
@@ -163,6 +170,7 @@ class NativeCollector:
             if len(response.content) > 8*1024*1024:
                 raise ProviderError('malformed')
             payload = response.json()
+            self.payload_received(payload)
             if not isinstance(payload,dict):
                 raise ProviderError('malformed')
             if key:
@@ -190,32 +198,112 @@ class ApeWisdomCollector(NativeCollector):
     provider = 'apewisdom'
     settings_model = ApeSettings
 
+    def _get(self, conn, url, params, now, quantity=0):
+        previous=getattr(self,'_diagnostic',{})
+        self._diagnostic=dict(phase='request',reason='request_failed',page=previous.get('page'),
+                              attempt=previous.get('attempt',0)+1)
+        return super()._get(conn,url,params,now,quantity)
+
+    def response_received(self, response):
+        # Never store URLs, header values, bodies, tickers or exception messages.
+        content_type=response.headers.get('Content-Type','').split(';',1)[0].strip().lower()
+        if content_type=='application/json' or content_type.endswith('+json'):
+            media='json'
+        elif content_type=='text/html':
+            media='html'
+        else:
+            media='other' if content_type else 'missing'
+        reason='invalid_json' if response.status_code==200 else 'http_status'
+        if response.status_code==200 and len(response.content)>8*1024*1024:
+            reason='body_too_large'
+        self._diagnostic.update(phase='json_decode' if response.status_code==200 else 'http_response',
+            reason=reason,http_status=response.status_code,media=media,body_bytes=len(response.content))
+
+    def payload_received(self, payload):
+        self._diagnostic.update(phase='response_schema',reason='payload_not_object')
+
+    def failure_diagnostic(self, exc):
+        if isinstance(exc,ProviderError): category=exc.status
+        elif isinstance(exc,(requests.exceptions.InvalidURL,requests.exceptions.InvalidSchema,requests.exceptions.MissingSchema)): category='invalid_url'
+        elif isinstance(exc,requests.Timeout): category='timeout'
+        elif isinstance(exc,requests.ConnectionError): category='connection_error'
+        elif isinstance(exc,ValueError) and self._diagnostic.get('phase')=='json_decode': category='invalid_json'
+        elif isinstance(exc,requests.RequestException): category='request_error'
+        else: category=type(exc).__name__
+        return json.dumps(dict(category=category,**self._diagnostic),sort_keys=True,separators=(',',':'))
+
     def collect_persist(self, conn, assets, now, clock):
         if not self.settings.access_confirmed:
             raise ProviderError('access_unverified')
         mapping = resolve(assets,self.settings.asset_map)
         key = self.run(conn,'all-crypto',now)
         rows = {}; complete = False; pages = 0
+        seen_pages={}
+        ambiguous_ticker = False
+        self._diagnostic={}
         try:
             for page in range(1,self.settings.max_pages+1):
+                self._diagnostic=dict(phase='request',reason='request_failed',page=page)
                 payload = self.get(conn,'https://apewisdom.io/api/v1.0/filter/all-crypto/page/'+str(page),{},now)
+                self._diagnostic.update(phase='pagination',reason='invalid_pages')
                 results = payload.get('results')
                 total_pages = integer(payload.get('pages'))
-                if not isinstance(results,list) or len(results)>100 or not total_pages or integer(payload.get('current_page')) != page:
+                self._diagnostic.update(phase='response_schema',reason='invalid_results')
+                if not isinstance(results,list) or len(results)>100:
                     raise ProviderError('malformed')
-                for item in results:
-                    ticker = item['ticker']
+                self._diagnostic.update(phase='pagination',reason='invalid_pages')
+                if not total_pages:
+                    raise ProviderError('malformed')
+                self._diagnostic['reported_pages']=total_pages
+                self._diagnostic['reason']='invalid_current_page'
+                current_page=integer(payload.get('current_page'))
+                self._diagnostic['reported_page']=current_page
+                self._diagnostic['reason']='page_mismatch'
+                if current_page != page:
+                    raise ProviderError('malformed')
+                for index,item in enumerate(results):
+                    self._diagnostic.update(phase='row_validation',reason='invalid_row',row_index=index,field='ticker')
+                    if not isinstance(item,dict):
+                        raise ProviderError('malformed')
+                    ticker = item.get('ticker')
+                    self._diagnostic['reason']='invalid_ticker'
                     if not isinstance(ticker,str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,100}',ticker):
                         raise ProviderError('malformed')
                     ticker=ticker.upper()
-                    values = [integer(item.get(k)) for k in ('mentions','upvotes','rank','mentions_24h_ago','rank_24h_ago')]
                     if ticker in rows:
+                        first_page=seen_pages[ticker]
+                        if first_page != page:
+                            self._diagnostic.update(reason='ambiguous_ticker',field='ticker',
+                                first_page=first_page,duplicate_scope='cross_page')
+                            ambiguous_ticker=True
+                            break
+                        self._diagnostic.update(reason='same_page_duplicate_ticker',field='ticker',
+                            first_page=first_page,duplicate_scope='same_page')
                         raise ProviderError('malformed')
+                    # Net votes can be negative; mentions and ranks cannot.
+                    values=[]
+                    for field in ('mentions','upvotes','rank','mentions_24h_ago','rank_24h_ago'):
+                        self._diagnostic.update(reason='invalid_count',field=field)
+                        values.append(integer(item.get(field),signed=field=='upvotes'))
                     rows[ticker]=values
+                    seen_pages[ticker]=page
+                if ambiguous_ticker:
+                    break
                 pages=page
                 if page>=total_pages:
                     complete=True; break
             receipt=clock()
+            if ambiguous_ticker:
+                # The API documents tickers and names, but no stable asset ID.
+                # Do not merge a possible distinct asset or persist a partial snapshot.
+                reason=json.dumps(dict(category='malformed',**self._diagnostic),
+                    sort_keys=True,separators=(',',':'))
+                conn.execute('''UPDATE attention_runs SET observed_ts=?,status='partial',
+                    complete=0,pages=?,resources=0,fingerprint=NULL,error=? WHERE id=?''',
+                    (receipt.isoformat(),pages,reason,key))
+                conn.commit()
+                return 'partial',0
+            self._diagnostic=dict(phase='persistence',reason='persistence_failed',page=pages)
             fingerprint=hashlib.sha256(json.dumps(rows,sort_keys=True).encode()).hexdigest()
             previous=conn.execute("SELECT fingerprint FROM attention_runs WHERE provider='apewisdom' AND id!=? AND fingerprint IS NOT NULL ORDER BY observed_ts DESC LIMIT 1",(key,)).fetchone()
             state='repeated' if previous and previous[0]==fingerprint else 'available' if complete else 'partial'
@@ -226,9 +314,11 @@ class ApeWisdomCollector(NativeCollector):
                 (receipt.isoformat(),state,int(complete),pages,len(rows),fingerprint,key))
             conn.commit()
             return state,len(rows)
-        except Exception:
+        except Exception as exc:
             conn.rollback()
-            conn.execute("UPDATE attention_runs SET status='failed',pages=? WHERE id=?",(pages,key))
+            # Store a bounded category, never exception bodies or request secrets.
+            reason = self.failure_diagnostic(exc)
+            conn.execute("UPDATE attention_runs SET status='failed',pages=?,error=? WHERE id=?",(pages,reason,key))
             conn.commit()
             raise
 

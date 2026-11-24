@@ -174,7 +174,10 @@ def upload_volumes(client, path, state_path, max_bytes=DEFAULT_MAX_BYTES):
             save_state(state_path,state)
         remote = client.existing(entry['file_id'])
         if remote is None:
-            remote = client.upload(entry['file_id'],volume,sha)
+            client.upload(entry['file_id'],volume,sha)
+            remote = client.existing(entry['file_id'])
+        if remote is None:
+            raise ValueError('Drive ZIP volume readback failed')
         if (remote.get('id') != entry['file_id'] or remote.get('trashed')
             or remote.get('name') != volume.name or remote.get('md5Checksum') != md5
             or int(remote.get('size',-1)) != expected['size']
