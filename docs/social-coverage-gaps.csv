@@ -1,0 +1,62 @@
+coin_id,uncovered_episodes,example_episode_id,example_anchor_utc,market_symbol,market_name,candidate_ticker,candidate_ticker_rows_before_anchor
+bitway,11,75,2026-09-24T19:28:03.447124+00:00,btw,Bitway,BTW.X,0
+midnight-3,9,131,2026-09-30T14:35:42.472652+00:00,,,,0
+lighter,8,50,2026-09-23T00:40:32.478315+00:00,lit,Lighter,LIT.X,0
+venice-token,7,300,2026-10-14T15:51:35.861444+00:00,vvv,Venice Token,VVV.X,0
+ethena,6,19,2026-09-22T20:29:46.766545+00:00,ena,Ethena,ENA.X,0
+near,6,45,2026-09-22T22:17:34.196918+00:00,near,NEAR Protocol,NEAR.X,0
+pearl-2,6,286,2026-10-13T17:21:13.946095+00:00,prl,Pearl,PRL.X,0
+blockstack,5,95,2026-09-25T12:58:48.136782+00:00,stx,Stacks,STX.X,0
+jupiter-exchange-solana,5,109,2026-09-27T20:54:15.269020+00:00,jup,Jupiter,JUP.X,0
+layerzero,5,129,2026-09-30T03:35:20.188195+00:00,zro,LayerZero,ZRO.X,0
+aerodrome-finance,4,88,2026-09-25T08:37:35.754408+00:00,aero,Aerodrome Finance,AERO.X,0
+algorand,4,67,2026-09-23T22:44:13.239592+00:00,algo,Algorand,ALGO.X,0
+arbitrum,4,12,2026-09-22T20:19:45.844591+00:00,arb,Arbitrum,ARB.X,0
+kaspa,4,71,2026-09-24T09:43:39.867303+00:00,kas,Kaspa,KAS.X,0
+pump-fun,4,89,2026-09-25T08:42:41.749667+00:00,pump,Pump.fun,PUMP.X,0
+quant-network,4,72,2026-09-24T13:59:45.468112+00:00,qnt,Quant,QNT.X,0
+render-token,4,171,2026-10-05T05:51:49.869425+00:00,render,Render,RENDER.X,0
+sky,4,5,2026-09-22T19:49:41.430926+00:00,sky,Sky,SKY.X,0
+avalanche-2,3,90,2026-09-25T10:30:01.511761+00:00,avax,Avalanche,AVAX.X,0
+bittensor,3,204,2026-10-08T17:30:15.723202+00:00,tao,Bittensor,TAO.X,0
+cosmos,3,97,2026-09-25T16:45:58.236958+00:00,atom,Cosmos Hub,ATOM.X,0
+filecoin,3,173,2026-10-05T07:18:57.682486+00:00,fil,Filecoin,FIL.X,0
+injective-protocol,3,22,2026-09-22T20:34:47.428108+00:00,inj,Injective,INJ.X,0
+pancakeswap-token,3,30,2026-09-22T20:39:47.962728+00:00,cake,PancakeSwap,CAKE.X,0
+polygon-ecosystem-token,3,91,2026-09-25T10:30:01.511761+00:00,pol,POL (ex-MATIC),POL.X,0
+stable-2,3,62,2026-09-23T13:56:34.584545+00:00,stable,​​Stable,STABLE.X,0
+worldcoin-wld,3,84,2026-09-25T02:29:09.451650+00:00,wld,Worldcoin,WLD.X,0
+xdce-crowd-sale,3,112,2026-09-28T00:34:32.727552+00:00,xdc,XDC Network,XDC.X,0
+akedo,2,85,2026-09-25T04:42:47.629296+00:00,ake,Akedo,AKE.X,0
+aptos,2,165,2026-10-05T01:36:24.708373+00:00,apt,Aptos,APT.X,0
+canton-network,2,83,2026-09-25T01:48:17.556927+00:00,cc,Canton,CC.X,0
+crypto-com-chain,2,79,2026-09-25T00:36:19.506235+00:00,cro,Cronos,CRO.X,0
+hyperliquid,2,163,2026-10-05T00:39:46.584610+00:00,hype,Hyperliquid,HYPE.X,0
+internet-computer,2,255,2026-10-11T17:39:55.289263+00:00,icp,Internet Computer,ICP.X,0
+morpho,2,832,2026-11-20T15:38:53.109146+00:00,morpho,Morpho,MORPHO.X,0
+ondo-finance,2,468,2026-10-26T06:55:03.096868+00:00,ondo,Ondo,ONDO.X,0
+pi-network,2,843,2026-11-21T22:52:33.109117+00:00,pi,Pi Network,PI.X,0
+pieverse,2,670,2026-11-09T15:24:42.009442+00:00,,,,0
+polkadot,2,394,2026-10-19T11:55:21.991061+00:00,dot,Polkadot,DOT.X,0
+rain,2,407,2026-10-20T17:39:52.036702+00:00,rain,Rain,RAIN.X,0
+aave,1,11,2026-09-22T20:19:45.844591+00:00,aave,Aave,AAVE.X,0
+bitcoin-cash,1,1,2026-09-22T19:44:40.882073+00:00,bch,Bitcoin Cash,BCH.X,0
+celestia,1,341,2026-10-16T07:25:36.709557+00:00,,,,0
+dash,1,496,2026-10-26T17:18:25.402155+00:00,dash,Dash,DASH.X,0
+ether-fi,1,20,2026-09-22T20:29:46.766545+00:00,ethfi,Ether.fi,ETHFI.X,0
+ethereum-classic,1,68,2026-09-24T05:48:41.584962+00:00,etc,Ethereum Classic,ETC.X,0
+hedera-hashgraph,1,110,2026-09-27T22:31:38.285276+00:00,hbar,Hedera,HBAR.X,0
+just,1,81,2026-09-25T01:22:25.872740+00:00,jst,JUST,JST.X,0
+mantle,1,64,2026-09-23T15:39:39.668267+00:00,mnt,Mantle,MNT.X,0
+monero,1,415,2026-10-21T00:37:01.837928+00:00,xmr,Monero,XMR.X,0
+okb,1,698,2026-11-11T12:08:17.866446+00:00,okb,OKB,OKB.X,0
+pepe,1,617,2026-11-07T21:46:34.047254+00:00,pepe,Pepe,PEPE.X,0
+pudgy-penguins,1,37,2026-09-22T20:51:40.384393+00:00,pengu,Pudgy Penguins,PENGU.X,0
+pyth-network,1,103,2026-09-26T19:53:37.604329+00:00,,,,0
+quack-ai,1,388,2026-10-19T03:47:22.622548+00:00,q,Quack AI,Q.X,0
+ripple,1,31,2026-09-22T20:51:40.384393+00:00,xrp,XRP,XRP.X,0
+starknet,1,226,2026-10-10T15:48:47.747470+00:00,,,,0
+the-open-network,1,210,2026-10-09T08:54:12.990019+00:00,gram,Gram (prev. Toncoin),GRAM.X,0
+uniswap,1,7,2026-09-22T19:59:43.130202+00:00,uni,Uniswap,UNI.X,0
+world-liberty-financial,1,653,2026-11-08T21:26:37.870165+00:00,wlfi,World Liberty Financial,WLFI.X,0
+zcash,1,41,2026-09-22T21:01:41.918153+00:00,zec,Zcash,ZEC.X,0
