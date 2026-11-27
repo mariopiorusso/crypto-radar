@@ -1,6 +1,9 @@
 """Offline-only Coinbase Exchange match processor. No network or trading code."""
 import argparse
 import json
+import os
+import tempfile
+import time
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -82,18 +85,31 @@ def main():
     p.add_argument('--fixture', type=Path); p.add_argument('--output', type=Path)
     p.add_argument('--enable-offline', action='store_true'); p.add_argument('--product', default='VVV-USD')
     p.add_argument('--snapshot-sequence', type=int); p.add_argument('--max-events', type=int, default=1000)
+    p.add_argument('--max-seconds', type=int, default=60, help='Offline processing deadline (1..3600 seconds).')
     a = p.parse_args()
     if not a.enable_offline or not a.fixture or not a.output or a.snapshot_sequence is None:
         p.error('explicit offline enable, fixture, output and snapshot sequence required')
     if a.fixture.resolve() == a.output.resolve(): p.error('output must differ from input')
     if not 1 <= a.max_events <= 10000: p.error('max-events must be 1..10000')
+    if not 1 <= a.max_seconds <= 3600: p.error('max-seconds must be 1..3600')
+    if not a.fixture.is_file(): p.error('fixture must be a regular file')
     processor = Processor(a.product, a.max_events); processor.begin_snapshot(a.snapshot_sequence)
-    # Exclusive creation avoids overwriting pre-existing data; only synthetic fixtures permitted.
-    with a.fixture.open(encoding='utf-8') as source, a.output.open('x', encoding='utf-8') as dest:
-        for line in source:
-            item = json.loads(line)
-            record = processor.process(item['message'], item['receipt_utc'])
-            dest.write(json.dumps(record, sort_keys=True) + '\n')
+    deadline = time.monotonic() + a.max_seconds
+    # Stage in the destination directory; publish exclusively only after successful EOF.
+    fd, temp_name = tempfile.mkstemp(prefix='.coinbase-incomplete-', dir=a.output.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as dest, a.fixture.open(encoding='utf-8') as source:
+            for line in source:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError('offline runtime limit reached')
+                item = json.loads(line)
+                record = processor.process(item['message'], item['receipt_utc'])
+                dest.write(json.dumps(record, sort_keys=True) + '\n')
+            if time.monotonic() >= deadline:
+                raise TimeoutError('offline runtime limit reached')
+        os.link(temp_name, a.output)
+    finally:
+        os.unlink(temp_name)
 
 
 if __name__ == '__main__': main()
