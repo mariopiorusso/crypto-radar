@@ -1,6 +1,6 @@
 # Frozen candidate shadow protocol
 
-Frozen before inspecting holdout outcomes on 27 November 2026. This is an offline feasibility analysis. No production settings or alert behavior change.
+Written before inspecting individual holdout outcomes on 27 November 2026. A feasibility query had already exposed the aggregate holdout size and stored mover count (26 episodes, 14 movers), so the holdout was not fully unseen. This is an offline feasibility analysis. No production settings or alert behavior change.
 
 Use the 26 November snapshot at cutoff 2026-11-26T19:47:11.507850Z. The development evidence is the 23 November snapshot and the prior candidate-timing report, which found many pre-crossing scores below 45. Do not optimize on the holdout. The holdout consists of fixed-anchor episodes from 2026-11-24T19:54:18.610593Z (24-hour embargo after the earlier snapshot cutoff) through 2026-11-25T19:47:11.507850Z inclusive, so the whole 24-hour outcome horizon is mature at cutoff. Report overlap and repeated assets; these records are not independent and are an event-conditioned cohort, not the universe of all asset-days.
 

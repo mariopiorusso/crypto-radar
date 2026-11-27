@@ -8,7 +8,7 @@ The [26 November manifest](https://drive.google.com/file/d/16LCnofHrA4GnyACBvK9C
 
 ## Frozen holdout
 
-The protocol fixes the old-data cutoff, 24-hour embargo, holdout dates, score 35 and completeness rules before evaluation. Among 26 distinct episode IDs and 26 assets, 14 had a recomputed sampled +5% crossing, 12 had no sampled crossing with the required coverage, and none were unknown under that coverage rule. All 14 recomputed crossings match stored timestamps. Each episode has at least one linked V1.1 evaluation; 7,981 linked rows were inspected in total. No same-asset holdout windows overlap within 24 hours, though cross-asset market events can be correlated.
+The protocol fixes the old-data cutoff, 24-hour embargo, holdout dates, score 35 and completeness rules before evaluating individual records. A feasibility query had already shown the aggregate 26-episode and 14-stored-mover counts before the protocol was written, so this is not an untouched holdout. Among 26 distinct episode IDs and 26 assets, 14 had a recomputed sampled +5% crossing, 12 had no sampled crossing with the required coverage, and none were unknown under that coverage rule. All 14 recomputed crossings match stored timestamps. Each episode has at least one linked V1.1 evaluation; 7,981 linked rows were inspected in total. No same-asset holdout windows overlap within 24 hours, though cross-asset market events can be correlated.
 
 | Measure | Recorded V1.1 | Score-35 shadow |
 | --- | ---: | ---: |
